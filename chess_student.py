@@ -1,10 +1,14 @@
-from degree_freedom.degree_freedom_king2 import *
-from features import *
-from generate_game import *
-from Q_values import *
+# from Q_values import *
+# from features import *
+import numpy as np
+
+from degree_freedom.degree_freedom_king1 import degree_freedom_king1
+from degree_freedom.degree_freedom_king2 import degree_freedom_king2
+from degree_freedom.degree_freedom_queen import degree_freedom_queen
+from generate_game import generate_game
+from util.board_printer import fancy_print_board
 
 size_board = 4
-
 
 
 def main():
@@ -22,7 +26,9 @@ def main():
     p_q1: same as p_k2 but for the Queen
     """
     s, p_k2, p_k1, p_q1 = generate_game(size_board)
-    
+
+    fancy_print_board(s)
+
     """
     Possible actions for the Queen are the eight directions (down, up, right, left, up-right, down-left, up-left, 
     down-right) multiplied by the number of squares that the Queen can cover in one movement which equals the size of 
@@ -64,17 +70,16 @@ def main():
     with board size of 4x4 this N=50
     """
     x = features(p_q1, p_k1, p_k2, dfK2, s, check)
-    
-    
-    N_in=np.shape(State)[x]
-    N_h=200
-    
-    W1=np.random.uniform(-1,1,[N_in,N_h])/(N_in+N_h)
-    b1=np.zeros([N_h])
-    
-    W2=np.random.uniform(-1,1,[N_h,N_a])/(N_in+N_h)
-    b2=np.zeros([N_a])
-    
+
+    N_in = np.shape(State)[x]
+    N_h = 200
+
+    W1 = np.random.uniform(-1, 1, [N_in, N_h]) / (N_in + N_h)
+    b1 = np.zeros([N_h])
+
+    W2 = np.random.uniform(-1, 1, [N_h, N_a]) / (N_in + N_h)
+    b2 = np.zeros([N_a])
+
     """
     Initialization
     Define the size of the layers and initialization
@@ -86,24 +91,23 @@ def main():
     refer to the number of nodes in the input layer and the number of nodes in the hidden layer respectively. The biases
      should be initialized with zeros.
     """
-    #n_input_layer = 1  # Number of neurons of the input layer. TODO: Change this value
-    #n_hidden_layer = 200  # Number of neurons of the hidden layer
-    #n_output_layer = 1  # Number of neurons of the output layer. TODO: Change this value accordingly
+    # n_input_layer = 1  # Number of neurons of the input layer. TODO: Change this value
+    # n_hidden_layer = 200  # Number of neurons of the hidden layer
+    # n_output_layer = 1  # Number of neurons of the output layer. TODO: Change this value accordingly
 
     """
     TODO: Define the w weights between the input and the hidden layer and the w weights between the hidden layer and the 
     output layer according to the instructions. Define also the biases.
     """
 
-
     # YOUR CODES ENDS HERE
 
     # Network Parameters
-    epsilon_0 = 0.2   #epsilon for the e-greedy policy
-    beta = 0.00005    #epsilon discount factor
-    gamma = 0.85      #SARSA Learning discount factor
-    eta = 0.0035      #learning rate
-    N_episodes = 100000 #Number of games, each game ends when we have a checkmate or a draw
+    epsilon_0 = 0.2  # epsilon for the e-greedy policy
+    beta = 0.00005  # epsilon discount factor
+    gamma = 0.85  # SARSA Learning discount factor
+    eta = 0.0035  # learning rate
+    N_episodes = 100000  # Number of games, each game ends when we have a checkmate or a draw
 
     ###  Training Loop  ###
 
@@ -118,7 +122,7 @@ def main():
                     [1, -1],
                     [-1, 1],
                     [-1, -1]])
-    
+
     # THE FOLLOWING VARIABLES COULD CONTAIN THE REWARDS PER EPISODE AND THE
     # NUMBER OF MOVES PER EPISODE, FILL THEM IN THE CODE ABOVE FOR THE
     # LEARNING. OTHER WAYS TO DO THIS ARE POSSIBLE, THIS IS A SUGGESTION ONLY.    
@@ -127,10 +131,9 @@ def main():
     N_moves_save = np.zeros([N_episodes, 1])
 
     # END OF SUGGESTIONS
-    
 
     for n in range(N_episodes):
-        
+
         epsilon_f = epsilon_0 / (1 + beta * n)
         checkmate = 0  # 0 = not a checkmate, 1 = checkmate
         draw = 0  # 0 = not a draw, 1 = draw
@@ -145,13 +148,11 @@ def main():
         dfQ1, a_q1, dfQ1_ = degree_freedom_queen(p_k1, p_k2, p_q1, s)
         # Possible actions of the enemy king
         dfK2, a_k2, check = degree_freedom_king2(dfK1, p_k2, dfQ1_, s, p_k1)
-        
-        if n%50==0:
-            
+
+        if n % 50 == 0:
             print(np.mean(R_save[:n]))
             print(np.mean(N_moves_save[:n]))
-        
-        
+
         while checkmate == 0 and draw == 0:
             R = 0  # Reward
 
@@ -170,19 +171,18 @@ def main():
             # network. You can change the input of the function by adding other
             # data, but the input of the function is suggested. 
             Q, x1 = Q_values(x, W1, W2, bias_W1, bias_W2)
-            Qvalues=np.copy(Q[allowed_a])
-            
-            rand_a=np.random.uniform(0,1)<epsilon
-            if rand_a==1:
-                
-                a_agent=np.permute(allowed_a)[0]
-                
+            Qvalues = np.copy(Q[allowed_a])
+
+            rand_a = np.random.uniform(0, 1) < epsilon
+            if rand_a == 1:
+
+                a_agent = np.permute(allowed_a)[0]
+
             else:
-                
-                a=np.argmax(Qvalues)
-                a_agent=np.copy(allowed_a[a])
-                        
-            
+
+                a = np.argmax(Qvalues)
+                a_agent = np.copy(allowed_a[a])
+
             """
             YOUR CODE STARTS HERE
             
@@ -192,13 +192,10 @@ def main():
             containing all the possible actions. Create a vector called a_agent that contains the index of the action 
             chosen. For instance, if a_allowed = [8, 16, 32] and you select the third action, a_agent=32 not 3.
             """
-            
-            
 
-            #a_agent = 1  # CHANGE THIS VALUE BASED ON YOUR CODE TO USE EPSILON GREEDY POLICY
-            
-            #THE CODE ENDS HERE. 
+            # a_agent = 1  # CHANGE THIS VALUE BASED ON YOUR CODE TO USE EPSILON GREEDY POLICY
 
+            # THE CODE ENDS HERE.
 
             # Player 1 makes the action
             if a_agent < possible_queen_a:
@@ -238,7 +235,7 @@ def main():
                 # Checkmate and collect reward
                 checkmate = 1
                 R = 1  # Reward for checkmate
-                
+
                 """
                 FILL THE CODE
                 Update the parameters of your network by applying backpropagation and Q-learning. You need to use the 
@@ -246,21 +243,20 @@ def main():
                 the action made. You computed previously Q values in the Q_values function. Be careful: this is the last 
                 iteration of the episode, the agent gave checkmate.
                 """
-                
-                delta=R-Q[a_agent]
-                
-                delta_W2=eta*delta*x1
-                delta_W1=eta*np.outer(x,delta*W2[:,a_agent]*(x1>0))                
 
-                
-                W2[:,a_agent]=W2[:,a_agent]+eta*delta_W2
-                b2[a_agent]=b2[a_agent]+eta*delta
-                
-                W1[:,a_agent]=W1[:,a_agent]+eta*delta_W1
-                b1=b1+eta*delta*W2[:,a_agent]*(x1>0)
-                
-                R_save[n]=np.copy(R)
-                N_moves_save[n]=np.copy(i)
+                delta = R - Q[a_agent]
+
+                delta_W2 = eta * delta * x1
+                delta_W1 = eta * np.outer(x, delta * W2[:, a_agent] * (x1 > 0))
+
+                W2[:, a_agent] = W2[:, a_agent] + eta * delta_W2
+                b2[a_agent] = b2[a_agent] + eta * delta
+
+                W1[:, a_agent] = W1[:, a_agent] + eta * delta_W1
+                b1 = b1 + eta * delta * W2[:, a_agent] * (x1 > 0)
+
+                R_save[n] = np.copy(R)
+                N_moves_save[n] = np.copy(i)
                 # THE CODE ENDS HERE
 
                 if checkmate:
@@ -278,23 +274,21 @@ def main():
                 the action made. You computed previously Q values in the Q_values function. Be careful: this is the last 
                 iteration of the episode, it is a draw.
                 """
-                
-                delta=R-Q[a_agent]
-                
-                delta_W2=eta*delta*x1
-                delta_W1=eta*np.outer(x,delta*W2[:,a_agent]*(x1>0))                
 
-                
-                W2[:,a_agent]=W2[:,a_agent]+eta*delta_W2
-                b2[a_agent]=b2[a_agent]+eta*delta
-                
-                W1[:,a_agent]=W1[:,a_agent]+eta*delta_W1
-                b1=b1+eta*delta*W2[:,a_agent]*(x1>0)
-                
-                R_save[n]=np.copy(R)
-                N_moves_save[n]=np.copy(i)
+                delta = R - Q[a_agent]
 
-                
+                delta_W2 = eta * delta * x1
+                delta_W1 = eta * np.outer(x, delta * W2[:, a_agent] * (x1 > 0))
+
+                W2[:, a_agent] = W2[:, a_agent] + eta * delta_W2
+                b2[a_agent] = b2[a_agent] + eta * delta
+
+                W1[:, a_agent] = W1[:, a_agent] + eta * delta_W1
+                b1 = b1 + eta * delta * W2[:, a_agent] * (x1 > 0)
+
+                R_save[n] = np.copy(R)
+                N_moves_save[n] = np.copy(i)
+
                 # YOUR CODE ENDS HERE
 
                 if draw:
@@ -328,20 +322,17 @@ def main():
             x_next = features(p_q1, p_k1, p_k2, dfK2, s, check)
             # Compute Q-values for the discounted factor
             Q_next, _ = Q_values(x_next, W1, W2, bias_W1, bias_W2)
-            
-            delta=R+gamma*np.max(Q_next)-Q[a_agent]
-            
-            delta_W2=eta*delta*x1
-            delta_W1=eta*np.outer(x,delta*W2[:,a_agent]*(x1>0))                
 
-            
-            W2[:,a_agent]=W2[:,a_agent]+eta*delta_W2
-            b2[a_agent]=b2[a_agent]+eta*delta
-            
-            W1[:,a_agent]=W1[:,a_agent]+eta*delta_W1
-            b1=b1+eta*delta*W2[:,a_agent]*(x1>0)
-            
-            
+            delta = R + gamma * np.max(Q_next) - Q[a_agent]
+
+            delta_W2 = eta * delta * x1
+            delta_W1 = eta * np.outer(x, delta * W2[:, a_agent] * (x1 > 0))
+
+            W2[:, a_agent] = W2[:, a_agent] + eta * delta_W2
+            b2[a_agent] = b2[a_agent] + eta * delta
+
+            W1[:, a_agent] = W1[:, a_agent] + eta * delta_W1
+            b1 = b1 + eta * delta * W2[:, a_agent] * (x1 > 0)
 
             """
             FILL THE CODE
@@ -353,7 +344,7 @@ def main():
 
             # YOUR CODE ENDS HERE
             i += 1
-            
+
 
 if __name__ == '__main__':
     main()
