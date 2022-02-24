@@ -1,7 +1,5 @@
-import numpy as np
-from degree_freedom_king1 import *
-from degree_freedom_queen import *
-
+from degree_freedom.degree_freedom_king1 import *
+from degree_freedom.degree_freedom_queen import *
 
 
 def generate_game(size_board):
@@ -18,14 +16,15 @@ def generate_game(size_board):
     q1 = 2  # Queen
     k2 = 3  # Enemy King
 
-    while(1):
+    while 1:
         # Spawn Queen at a random location of the board
         p_q1 = [int(np.ceil(np.random.rand() * (size_board - 1))), int(np.ceil(np.random.rand() * (size_board - 1)))]
         s[p_q1[0], p_q1[1]] = q1
 
         # Spawn King at a random location which is occupied
-        while(1):
-            p_k1 = [int(np.ceil(np.random.rand() * (size_board - 1))), int(np.ceil(np.random.rand() * (size_board - 1)))]
+        while 1:
+            p_k1 = [int(np.ceil(np.random.rand() * (size_board - 1))),
+                    int(np.ceil(np.random.rand() * (size_board - 1)))]
             if p_k1 != p_q1:
                 break
         s[p_k1[0], p_k1[1]] = k1
