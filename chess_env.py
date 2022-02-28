@@ -94,7 +94,7 @@ class ChessEnv:
 
         return self.Board, X, allowed_a
 
-    def one_step(self, a_agent):
+    def one_step(self, agent_action):
         """
         OneStep. The method performs a one step update of the system. Given as input the action selected by the agent,
         it updates the chess board by performing that action and the response of the enemy king (which is a random allowed
@@ -116,11 +116,11 @@ class ChessEnv:
 
         # PERFORM THE AGENT'S ACTION ON THE CHESS BOARD
 
-        if a_agent < self.possible_queen_a:  # THE AGENT MOVED ITS QUEEN
+        if agent_action < self.possible_queen_a:  # THE AGENT MOVED ITS QUEEN
 
             # UPDATE QUEEN'S POSITION
-            direction = int(np.ceil((a_agent + 1) / (self.N_grid - 1))) - 1
-            steps = a_agent - direction * (self.N_grid - 1) + 1
+            direction = int(np.ceil((agent_action + 1) / (self.N_grid - 1))) - 1
+            steps = agent_action - direction * (self.N_grid - 1) + 1
 
             self.Board[self.p_q1[0], self.p_q1[1]] = 0
 
@@ -132,7 +132,7 @@ class ChessEnv:
         else:  # THE AGENT MOVED ITS KING
 
             # UPDATE KING'S POSITION
-            direction = a_agent - self.possible_queen_a
+            direction = agent_action - self.possible_queen_a
             steps = 1
 
             self.Board[self.p_k1[0], self.p_k1[1]] = 0
