@@ -83,19 +83,20 @@ class Neural_net:
                     e_n = R + self.gamma * qvalue_next - qvalue
                 delta = x[-1] * (1 - x[-1]) * e_n
             else:
-                delta = x[-(idx + 1)] * (1 - x[-(idx + 1)]) * np.dot(np.transpose(self.weights[-idx]),
-                                                                     delta)
+                delta = x[-(idx + 1)] * (1 - x[-(idx + 1)]) * np.dot(np.transpose(self.weights[-idx]), delta)
             dweights[-(idx + 1)] += np.outer(delta, x[-(idx + 2)])
             dbiases[-(idx + 1)] += delta
 
         for idx in range(len(self.weights)):
             self.weights[idx] += self.eta * dweights[idx] * x[idx]
-            # self.biases[idx] += self.eta * dbiases[idx] * x[idx]
+            self.biases[idx] += self.eta * dbiases[idx]
 
     def train(self, N_episodes):
 
         R_save = np.zeros([N_episodes, 1])
         N_moves_save = np.zeros([N_episodes, 1])
+
+        interm_output_nr = 1000
 
         for n in range(N_episodes):
             epsilon_f = self.epsilon_0 / (1 + self.beta * n)  ## DECAYING EPSILON
@@ -104,8 +105,10 @@ class Neural_net:
 
             S, X, allowed_a = self.env.initialise_game()
 
-            if n % 1000 == 0:
+            if n % interm_output_nr == 0 and n > 0:
                 print(f"Epoche ({n}/{N_episodes})")
+                print('Chessy Agent, Average reward:', np.mean(R_save[(n-interm_output_nr):n]),
+                      'Number of steps: ', np.mean(N_moves_save[(n-interm_output_nr):n]))
 
             while Done == 0:
                 a, _ = np.where(allowed_a == 1)

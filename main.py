@@ -75,13 +75,13 @@ def perform_nerual_network(env):
     board_state, X, allowed_actions = env.initialise_game()
     N_a = np.shape(allowed_actions)[0]  # TOTAL NUMBER OF POSSIBLE ACTIONS
     N_in = np.shape(X)[0]  # INPUT SIZE
-    N_h = 200  # NUMBER OF HIDDEN NODES
+    N_h = 100  # NUMBER OF HIDDEN NODES
 
     # INITALISE YOUR NEURAL NETWORK...
     # HYPERPARAMETERS SUGGESTED (FOR A GRID SIZE OF 4)
-    nn = Neural_net(env, [N_in, N_h, N_a])
+    nn = Neural_net(env, [N_in, N_h, N_a], xavier=True)
 
-    N_episodes = 1000  # THE NUMBER OF GAMES TO BE PLAYED
+    N_episodes = 100000  # THE NUMBER OF GAMES TO BE PLAYED
 
     nn.train(N_episodes)
 
