@@ -12,15 +12,16 @@ def print_first_five(env):
 
     # PRINT VARIABLE THAT TELLS IF ENEMY KING IS IN CHECK (1) OR NOT (0)
     print("check? ", env.check)
-    print(
-        "dofk2 ", np.sum(env.dfk2_constrain).astype(int)
-    )  # PRINT THE NUMBER OF LOCATIONS THAT THE ENEMY KING CAN MOVE TO
+    print("dofk2 ",
+          np.sum(env.dfk2_constrain).astype(int)
+          )  # PRINT THE NUMBER OF LOCATIONS THAT THE ENEMY KING CAN MOVE TO
 
     for i in range(5):
         a, _ = np.where(allowed_a == 1)  # FIND WHAT THE ALLOWED ACTIONS ARE
         a_agent = np.random.permutation(a)[0]  # MAKE A RANDOM ACTION
 
-        S, X, allowed_a, R, Done = env.one_step(a_agent)  # UPDATE THE ENVIRONMENT
+        S, X, allowed_a, R, Done = env.one_step(
+            a_agent)  # UPDATE THE ENVIRONMENT
 
         # PRINT CHESS BOARD AND VARIABLES
         print("")
@@ -52,7 +53,8 @@ def perform_random_agent(env, N_episodes=1000):
             a, _ = np.where(allowed_actions == 1)
             current_action = np.random.permutation(a)[0]
 
-            board_state, X, allowed_actions, R, done = env.one_step(current_action)
+            board_state, X, allowed_actions, R, done = env.one_step(
+                current_action)
 
             if done:
                 R_save_random[n] = np.copy(R)

@@ -2,11 +2,12 @@ import numpy as np
 
 
 class Adam:
+
     def __init__(self, Params, beta1):
 
-        N_dim = np.shape(np.shape(Params))[
-            0
-        ]  # It finds out if the parameters given are in a vector (N_dim=1) or a matrix (N_dim=2)
+        N_dim = np.shape(
+            np.shape(Params)
+        )[0]  # It finds out if the parameters given are in a vector (N_dim=1) or a matrix (N_dim=2)
 
         # INITIALISATION OF THE MOMENTUMS
         if N_dim == 1:
@@ -26,7 +27,7 @@ class Adam:
         self.beta1 = beta1
         self.beta2 = 0.999
 
-        self.epsilon = 10 ** (-8)
+        self.epsilon = 10**(-8)
 
         # COUNTER OF THE TRAINING PROCESS
         self.counter = 0
@@ -37,10 +38,10 @@ class Adam:
 
         self.mt = self.beta1 * self.mt + (1 - self.beta1) * Grads
 
-        self.vt = self.beta2 * self.vt + (1 - self.beta2) * Grads ** 2
+        self.vt = self.beta2 * self.vt + (1 - self.beta2) * Grads**2
 
-        mt_n = self.mt / (1 - self.beta1 ** self.counter)
-        vt_n = self.vt / (1 - self.beta2 ** self.counter)
+        mt_n = self.mt / (1 - self.beta1**self.counter)
+        vt_n = self.vt / (1 - self.beta2**self.counter)
 
         New_grads = mt_n / (np.sqrt(vt_n) + self.epsilon)
 
