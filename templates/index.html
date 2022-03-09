@@ -5,7 +5,12 @@
 
 {% include "chess_board.html" %}
 
+<h3 class="mt-4 mb-2">End State of one Epoch</h3>
 <div id="myBoard" style="width: 100%; margin: auto"></div>
+
+<p class="text-muted mx-auto" style="max-width: 400px; font-style: italic">
+    Click on the board to refresh it. Due to performance reason, it will only refresh every 2 seconds
+</p>
 
 <script>
     var position = JSON.parse('{{board | tojson}}');
@@ -18,7 +23,7 @@
     setInterval(function () {
         var position = document.getElementById("json_board").innerText;
         board.position(JSON.parse(position));
-    }, 500);
+    }, 2000);
 </script>
 
 
