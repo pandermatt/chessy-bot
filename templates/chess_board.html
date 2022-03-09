@@ -1,0 +1,43 @@
+<div id="load" class="load">
+    <div class="row">
+        <div class="col-sm">
+            <dl>
+                <dt>Epoch</dt>
+                <dd>{{epoche_string}}</dd>
+            </dl>
+        </div>
+        <div class="col-sm">
+            <dl>
+                <dt>Average reward</dt>
+                <dd>{{average_reward}}</dd>
+            </dl>
+        </div>
+        <div class="col-sm">
+            <dl>
+                <dt>Num of steps</dt>
+                <dd>{{num_of_steps}}</dd>
+            </dl>
+        </div>
+    </div>
+
+
+    <div class="myProgress my-4">
+        <div class="myBar">{{percentage_label}}</div>
+    </div>
+
+    <p id="json_board">{{board | tojson}}</p>
+    <style>
+        .myProgress {
+            width: 100%;
+            background-color: #e5e5e5;
+        }
+
+        .myBar {
+            width: {{percentage}};
+            height: 25px;
+            background-color: cornflowerblue;
+            color: white;
+        }
+    </style>
+
+</div>

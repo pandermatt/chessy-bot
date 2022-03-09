@@ -1,7 +1,5 @@
 from chess_env import *
-from Neural_net import Neural_net
-
-size_board = 4
+from chessy_agent import ChessyAgent
 
 
 def print_first_five(env):
@@ -66,34 +64,14 @@ def perform_random_agent(env, N_episodes=1000):
     print('Random Agent, Average reward:', np.mean(R_save_random), 'Number of steps: ', np.mean(N_moves_save_random))
 
 
-def perform_nerual_network(env):
-    # INITIALISE THE PARAMETERS OF YOUR NEURAL NETWORK AND...
-    # PLEASE CONSIDER USING A MASK OF ONE FOR THE ACTION MADE
-    # AND ZERO OTHERWISE IF YOU ARE NOT USING VANILLA GRADIENT DESCENT...
-    # WE SUGGEST A NETWORK WITH ONE HIDDEN LAYER WITH SIZE 200.
-
-    board_state, X, allowed_actions = env.initialise_game()
-    N_a = np.shape(allowed_actions)[0]  # TOTAL NUMBER OF POSSIBLE ACTIONS
-    N_in = np.shape(X)[0]  # INPUT SIZE
-    N_h1 = 200  # NUMBER OF HIDDEN NODES
-
-    # INITALISE YOUR NEURAL NETWORK...
-    # HYPERPARAMETERS SUGGESTED (FOR A GRID SIZE OF 4)
-    nn = Neural_net(env, [N_in, N_h1, N_a], xavier=True)
-
-    N_episodes = 300000  # THE NUMBER OF GAMES TO BE PLAYED
-
-    nn.train(N_episodes)
-
-
 if __name__ == '__main__':
-    chess_env = ChessEnv(size_board)
+    board_size = 4
 
     print(f"===== First 5 Steps =====")
-    print_first_five(chess_env)
+    print_first_five(ChessEnv(board_size))
 
     print(f"===== Random Agent =====")
-    perform_random_agent(chess_env)
+    perform_random_agent(ChessEnv(board_size))
 
     print(f"===== Neural Network =====")
-    perform_nerual_network(chess_env)
+    ChessyAgent(board_size).run(lambda *args: None)

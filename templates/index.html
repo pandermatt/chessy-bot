@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Chessy Bot</h1>
+
+{% include "chess_board.html" %}
+
+<div id="myBoard" style="width: 100%; margin: auto"></div>
+
+<script>
+    var position = JSON.parse('{{board | tojson}}');
+    var board = Chessboard('myBoard', position)
+
+    $("#myBoard").click(function () {
+        var position = document.getElementById("json_board").innerText;
+        board.position(JSON.parse(position));
+    })
+    setInterval(function () {
+        var position = document.getElementById("json_board").innerText;
+        board.position(JSON.parse(position));
+    }, 500);
+</script>
+
+
+{% endblock %}

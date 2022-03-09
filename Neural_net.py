@@ -1,16 +1,11 @@
 # Import
-
-import numpy as np
-import numpy.matlib
+import math
 import random
-import matplotlib.pyplot as plt
-from degree_freedom import degree_freedom_queen
-from degree_freedom import degree_freedom_king1
-from degree_freedom import degree_freedom_king2
+
+import numpy.matlib
+
+from adam import Adam
 from generate_game import *
-from chess_env import ChessEnv
-import pickle
-from Adam import Adam
 
 
 # input_layer_size = 10
@@ -18,7 +13,7 @@ from Adam import Adam
 # output_layer_size = x
 # input: layer_sizes = [input_layer_size, first_hidden_layer_size, ..., output_layer_size]
 
-class Neural_net:
+class NeuralNet:
     def __init__(self, env, layer_sizes, xavier=False):
         self.env = env
         self.epsilon_0 = 0.25  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
@@ -101,7 +96,7 @@ class Neural_net:
             self.weights[idx] += self.eta * self.adam_w[idx].Compute(dweights[idx]) * x[idx]
             self.biases[idx] += self.eta * self.adam_b[idx].Compute(dbiases[idx])
 
-    def train(self, N_episodes):
+    def train(self, N_episodes, callback):
 
         R_save = np.zeros([N_episodes, 1])
         N_moves_save = np.zeros([N_episodes, 1])
@@ -117,8 +112,8 @@ class Neural_net:
 
             if n % interm_output_nr == 0 and n > 0:
                 print(f"Epoche ({n}/{N_episodes})")
-                print('Chessy Agent, Average reward:', np.mean(R_save[(n-interm_output_nr):n]),
-                      'Number of steps: ', np.mean(N_moves_save[(n-interm_output_nr):n]))
+                print('Chessy Agent, Average reward:', np.mean(R_save[(n - interm_output_nr):n]),
+                      'Number of steps: ', np.mean(N_moves_save[(n - interm_output_nr):n]))
 
             while Done == 0:
                 a, _ = np.where(allowed_a == 1)
@@ -152,4 +147,27 @@ class Neural_net:
 
                 move_counter += 1  # UPDATE COUNTER FOR NUMBER OF ACTIONS
 
+            callback({'board': self.calculate_location(S),
+                      'epoche_string': f"{n}/{N_episodes}",
+                      'average_reward': np.mean(R_save[(n - interm_output_nr):n]),
+                      'num_of_steps': np.mean(N_moves_save[(n - interm_output_nr):n]),
+                      'percentage': f"{n / N_episodes * 100}%",
+                      'percentage_label': f"{math.ceil(n / N_episodes * 100)}%"
+                      })
+            # time.sleep(0.5)
+
         print('Chessy Agent, Average reward:', np.mean(R_save), 'Number of steps: ', np.mean(N_moves_save))
+
+    def calculate_location(self, S):
+        board = np.array(S)
+        board_location = {
+            self.convert_location_to_letters(board, 1): 'wK',  # 1 = location of the King bK
+            self.convert_location_to_letters(board, 2): 'wQ',  # 2 = location of the Queen wQ
+            self.convert_location_to_letters(board, 3): 'bK',  # 3 = location fo the Enemy King wK
+        }
+        return board_location
+
+    @staticmethod
+    def convert_location_to_letters(board, figure_id):
+        match = np.where(board == figure_id)
+        return f"{chr(97 + match[0][0])}{match[1][0] + 1}"
