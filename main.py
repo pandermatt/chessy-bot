@@ -10,7 +10,8 @@ def print_first_five(env):
 
     print(S)  # PRINT CHESS BOARD (SEE THE DESCRIPTION ABOVE)
 
-    print('check? ', env.check)  # PRINT VARIABLE THAT TELLS IF ENEMY KING IS IN CHECK (1) OR NOT (0)
+    # PRINT VARIABLE THAT TELLS IF ENEMY KING IS IN CHECK (1) OR NOT (0)
+    print('check? ', env.check)
     print('dofk2 ',
           np.sum(env.dfk2_constrain).astype(int))  # PRINT THE NUMBER OF LOCATIONS THAT THE ENEMY KING CAN MOVE TO
 
@@ -18,7 +19,8 @@ def print_first_five(env):
         a, _ = np.where(allowed_a == 1)  # FIND WHAT THE ALLOWED ACTIONS ARE
         a_agent = np.random.permutation(a)[0]  # MAKE A RANDOM ACTION
 
-        S, X, allowed_a, R, Done = env.one_step(a_agent)  # UPDATE THE ENVIRONMENT
+        S, X, allowed_a, R, Done = env.one_step(
+            a_agent)  # UPDATE THE ENVIRONMENT
 
         # PRINT CHESS BOARD AND VARIABLES
         print('')
@@ -50,7 +52,8 @@ def perform_random_agent(env, N_episodes=1000):
             a, _ = np.where(allowed_actions == 1)
             current_action = np.random.permutation(a)[0]
 
-            board_state, X, allowed_actions, R, done = env.one_step(current_action)
+            board_state, X, allowed_actions, R, done = env.one_step(
+                current_action)
 
             if done:
                 R_save_random[n] = np.copy(R)
@@ -63,7 +66,8 @@ def perform_random_agent(env, N_episodes=1000):
     # SINCE THE MAJORITY OF THE POSITIONS END WITH A DRAW
     # (THE ENEMY KING IS NOT IN CHECK AND CAN'T MOVE)
 
-    print('Random Agent, Average reward:', np.mean(R_save_random), 'Number of steps: ', np.mean(N_moves_save_random))
+    print('Random Agent, Average reward:', np.mean(R_save_random),
+          'Number of steps: ', np.mean(N_moves_save_random))
 
 
 def perform_nerual_network(env):
