@@ -10,6 +10,7 @@ from degree_freedom import degree_freedom_king2
 from generate_game import *
 from chess_env import ChessEnv
 import pickle
+from Adam import Adam
 
 
 # input_layer_size = 10
@@ -20,10 +21,14 @@ import pickle
 class Neural_net:
     def __init__(self, env, layer_sizes, xavier=False):
         self.env = env
-        self.epsilon_0 = 0.2  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
+        self.epsilon_0 = 0.25  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
         self.beta = 0.00005  # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
-        self.gamma = 0.85  # THE DISCOUNT FACTOR
-        self.eta = 0.0035  # THE LEARNING RATE
+        self.gamma = 0.8  # THE DISCOUNT FACTOR
+        self.eta = 0.004  # THE LEARNING RATE
+        self.beta_adam = 0.9
+
+        self.adam_w = []
+        self.adam_b = []
 
         # initialize weights
         self.weights = []
@@ -44,19 +49,20 @@ class Neural_net:
         self.weights = np.array(self.weights)
         self.biases = np.array(self.biases)
 
+        # initialize Adam
+        for idx in range(len(self.weights)):
+            self.adam_w.append(Adam(self.weights[idx], self.beta_adam))
+            self.adam_b.append(Adam(self.biases[idx], self.beta_adam))
+
     def _epsilongreedy_policy(self, Qvalues, a, epsilon):
-        rand_value = np.random.uniform(0, 1)
-
-        rand_a = rand_value < epsilon
-
-        if rand_a:
+        if np.random.uniform(0, 1) < epsilon:
             choice = random.choice(a)
             a = choice
         else:
             choice = np.argmax(Qvalues[a])
             a = a[choice]
 
-        qvalue = Qvalues[a]
+        qvalue = np.array([Qvalues[a] if i == a else 0 for i in range(len(Qvalues))])
         return a, qvalue
 
     def _forward_pass(self, X):
@@ -71,6 +77,10 @@ class Neural_net:
     def _backprop(self, x, R, qvalue, Done, qvalue_next=0):
         dweights = []
         dbiases = []
+        R_vec = qvalue.copy()
+        idx = np.argmax(qvalue)
+        R_vec[idx] = R
+        x[-1] = qvalue
         for idx in range(len(self.weights)):
             dweights.append(np.zeros(self.weights[idx].shape))
             dbiases.append(np.zeros(self.biases[idx].shape))
@@ -88,8 +98,8 @@ class Neural_net:
             dbiases[-(idx + 1)] += delta
 
         for idx in range(len(self.weights)):
-            self.weights[idx] += self.eta * dweights[idx] * x[idx]
-            self.biases[idx] += self.eta * dbiases[idx]
+            self.weights[idx] += self.eta * self.adam_w[idx].Compute(dweights[idx]) * x[idx]
+            self.biases[idx] += self.eta * self.adam_b[idx].Compute(dbiases[idx])
 
     def train(self, N_episodes):
 
@@ -117,12 +127,11 @@ class Neural_net:
 
                 S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
 
-                ## THE EPISODE HAS ENDED, UPDATE...BE CAREFUL, THIS IS THE LAST STEP OF THE EPISODE
+                ## THE EPISODE HAS ENDED, UPDATE... BE CAREFUL, THIS IS THE LAST STEP OF THE EPISODE
                 if Done == 1:
 
                     R_save[n] = np.copy(R)
                     N_moves_save[n] = np.copy(move_counter)
-
                     self._backprop(x, R, qvalue, Done)
 
                     break
@@ -132,7 +141,7 @@ class Neural_net:
                     # Compute the delta
                     a_next, _ = np.where(allowed_a_next == 1)
                     x_next = self._forward_pass(X_next)
-                    a_agent_next, qvalue_next = self._epsilongreedy_policy(x_next[-1], a_next, epsilon_f)
+                    a_agent_next, qvalue_next = self._epsilongreedy_policy(x_next[-1], a_next, 0)
 
                     self._backprop(x, R, qvalue, Done, qvalue_next)
 
