@@ -1,17 +1,17 @@
 # Import
 
+import pickle
+import random
+
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.matlib
-import random
-import matplotlib.pyplot as plt
-from degree_freedom import degree_freedom_queen
-from degree_freedom import degree_freedom_king1
-from degree_freedom import degree_freedom_king2
-from generate_game import *
-from chess_env import ChessEnv
-import pickle
-from Adam import Adam
 
+from Adam import Adam
+from chess_env import ChessEnv
+from degree_freedom import (degree_freedom_king1, degree_freedom_king2,
+                            degree_freedom_queen)
+from generate_game import *
 
 # input_layer_size = 10
 # first_hidden_layer_size = 15
