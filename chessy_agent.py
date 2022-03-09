@@ -23,6 +23,6 @@ class ChessyAgent:
         # HYPERPARAMETERS SUGGESTED (FOR A GRID SIZE OF 4)
         nn = NeuralNet(self.env, [N_in, N_h1, N_a], xavier=True)
 
-        N_episodes = 300000  # THE NUMBER OF GAMES TO BE PLAYED
+        N_episodes = 200000  # THE NUMBER OF GAMES TO BE PLAYED
 
         nn.train(N_episodes, callback)

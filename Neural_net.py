@@ -101,7 +101,8 @@ class NeuralNet:
         R_save = np.zeros([N_episodes, 1])
         N_moves_save = np.zeros([N_episodes, 1])
 
-        interm_output_nr = 1000
+        intern_output_nr = 1000
+        web_output_nr = 10
 
         for n in range(N_episodes):
             epsilon_f = self.epsilon_0 / (1 + self.beta * n)  ## DECAYING EPSILON
@@ -110,10 +111,10 @@ class NeuralNet:
 
             S, X, allowed_a = self.env.initialise_game()
 
-            if n % interm_output_nr == 0 and n > 0:
+            if n % intern_output_nr == 0 and n > 0:
                 print(f"Epoche ({n}/{N_episodes})")
-                print('Chessy Agent, Average reward:', np.mean(R_save[(n - interm_output_nr):n]),
-                      'Number of steps: ', np.mean(N_moves_save[(n - interm_output_nr):n]))
+                print('Chessy Agent, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
+                      'Number of steps: ', np.mean(N_moves_save[(n - intern_output_nr):n]))
 
             while Done == 0:
                 a, _ = np.where(allowed_a == 1)
@@ -147,14 +148,14 @@ class NeuralNet:
 
                 move_counter += 1  # UPDATE COUNTER FOR NUMBER OF ACTIONS
 
-            callback({'board': self.calculate_location(S),
-                      'epoche_string': f"{n}/{N_episodes}",
-                      'average_reward': np.mean(R_save[(n - interm_output_nr):n]),
-                      'num_of_steps': np.mean(N_moves_save[(n - interm_output_nr):n]),
-                      'percentage': f"{n / N_episodes * 100}%",
-                      'percentage_label': f"{math.ceil(n / N_episodes * 100)}%"
-                      })
-            # time.sleep(0.5)
+            if n % web_output_nr == 0:
+                callback({'board': self.calculate_location(S),
+                          'epoche_string': f"{n}/{N_episodes}",
+                          'average_reward': np.mean(R_save[(n - intern_output_nr):n]),
+                          'num_of_steps': np.mean(N_moves_save[(n - intern_output_nr):n]),
+                          'percentage': f"{n / N_episodes * 100}%",
+                          'percentage_label': f"{math.ceil(n / N_episodes * 100)}%"
+                          })
 
         print('Chessy Agent, Average reward:', np.mean(R_save), 'Number of steps: ', np.mean(N_moves_save))
 
