@@ -128,3 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 *.pickle
+/Assignment_ValueApprox.ipynb
+.idea/chessy-bot.iml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/workspace.xml
