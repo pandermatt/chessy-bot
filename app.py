@@ -5,7 +5,7 @@ import numpy as np
 from flask import Flask, render_template
 from turbo_flask import Turbo
 
-from agents.chessy_agent import ChessyAgent
+from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent
 from agents.first_five_agent import FirstFiveAgent
 from agents.random_agent import RandomAgent
 
@@ -36,8 +36,8 @@ def update_load():
             global app_content
             app_content = {'board': calculate_location(S),
                            'epoche_string': f"{n}/{N_episodes}",
-                           'average_reward': np.mean(R_save[(n - 1000):n]),
-                           'num_of_steps': np.mean(N_moves_save[(n - 1000):n]),
+                           'average_reward': np.mean(R_save[(n - 100):n]),
+                           'num_of_steps': np.mean(N_moves_save[(n - 100):n]),
                            'percentage': f"{n / N_episodes * 100}%",
                            'percentage_label': f"{math.ceil(n / N_episodes * 100)}%"
                            }
@@ -45,7 +45,8 @@ def update_load():
 
         FirstFiveAgent().run(update_web)
         RandomAgent().run(update_web)
-        ChessyAgent().run(update_web)
+        SarsaChessyAgent(60000).run(update_web)
+        QLearningChessyAgent(60000).run(update_web)
 
 
 def calculate_location(S):

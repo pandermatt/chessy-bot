@@ -3,6 +3,7 @@ import random
 
 from adam import Adam
 from generate_game import *
+from util.storage_io import dump_file, is_model_present, load_file
 
 
 def epsilongreedy_policy(Qvalues, a, epsilon):
@@ -111,6 +112,9 @@ class NeuralNet:
         return epsilongreedy_policy(param, a_next, epsilon_f)
 
     def train(self, N_episodes, callback):
+        if is_model_present(self._name):
+            self = load_file(self._name)
+
         R_save = np.zeros([N_episodes, 1])
         avg_reward = np.zeros(N_episodes)
         checkmate_save = np.zeros(N_episodes)
@@ -129,6 +133,7 @@ class NeuralNet:
             S, X, allowed_a = self.env.initialise_game()
 
             if n % intern_output_nr == 0 and n > 0:
+                dump_file(self, self._name)
                 print(f"Epoche ({n}/{N_episodes})")
 
                 print(f'{self._name}, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
