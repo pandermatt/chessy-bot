@@ -3,7 +3,6 @@ from generate_game import *
 
 
 class ChessEnv:
-
     def __init__(self, n_grid):
 
         self.reward_step = -0.05
@@ -12,8 +11,9 @@ class ChessEnv:
 
         self.N_grid = n_grid  # SIZE OF THE BOARD
 
-        self.Board = np.zeros([n_grid,
-                               n_grid])  # THE BOARD, THIS WILL BE FILLED BY 0 (NO PIECE), 1 (AGENT'S KING), 2 (AGENT'S QUEEN), 3 (OPPONENT'S KING)
+        self.Board = np.zeros(
+            [n_grid, n_grid]
+        )  # THE BOARD, THIS WILL BE FILLED BY 0 (NO PIECE), 1 (AGENT'S KING), 2 (AGENT'S QUEEN), 3 (OPPONENT'S KING)
 
         # POSITION OF THE AGENT'S KING AS COORDINATES
         self.p_k1 = np.zeros([2, 1])
@@ -22,19 +22,25 @@ class ChessEnv:
         # POSITION OF THE AGENT'S QUEEN AS COORDINATES
         self.p_q1 = np.zeros([2, 1])
 
-        self.dfk1 = np.zeros([n_grid,
-                              n_grid])  # ALL POSSIBLE ACTIONS FOR THE AGENT'S KING (LOCATIONS WHERE IT CAN MOVE WITHOUT THE PRESENCE OF THE OTHER PIECES)
-        self.dfk2 = np.zeros([n_grid,
-                              n_grid])  # ALL POSSIBLE ACTIONS FOR THE OPPONENT'S KING (LOCATIONS WHERE IT CAN MOVE WITHOUT THE PRESENCE OF THE OTHER PIECES)
-        self.dfq1 = np.zeros([n_grid,
-                              n_grid])  # ALL POSSIBLE ACTIONS FOR THE AGENT'S QUEEN (LOCATIONS WHERE IT CAN MOVE WITHOUT THE PRESENCE OF THE OTHER PIECES)
+        self.dfk1 = np.zeros(
+            [n_grid, n_grid]
+        )  # ALL POSSIBLE ACTIONS FOR THE AGENT'S KING (LOCATIONS WHERE IT CAN MOVE WITHOUT THE PRESENCE OF THE OTHER PIECES)
+        self.dfk2 = np.zeros(
+            [n_grid, n_grid]
+        )  # ALL POSSIBLE ACTIONS FOR THE OPPONENT'S KING (LOCATIONS WHERE IT CAN MOVE WITHOUT THE PRESENCE OF THE OTHER PIECES)
+        self.dfq1 = np.zeros(
+            [n_grid, n_grid]
+        )  # ALL POSSIBLE ACTIONS FOR THE AGENT'S QUEEN (LOCATIONS WHERE IT CAN MOVE WITHOUT THE PRESENCE OF THE OTHER PIECES)
 
         self.dfk1_constrain = np.zeros(
-            [n_grid, n_grid])  # ALLOWED ACTIONS FOR THE AGENT'S KING CONSIDERING ALSO THE OTHER PIECES
+            [n_grid, n_grid]
+        )  # ALLOWED ACTIONS FOR THE AGENT'S KING CONSIDERING ALSO THE OTHER PIECES
         self.dfk2_constrain = np.zeros(
-            [n_grid, n_grid])  # ALLOWED ACTIONS FOT THE OPPONENT'S KING CONSIDERING ALSO THE OTHER PIECES
+            [n_grid, n_grid]
+        )  # ALLOWED ACTIONS FOT THE OPPONENT'S KING CONSIDERING ALSO THE OTHER PIECES
         self.dfq1_constrain = np.zeros(
-            [n_grid, n_grid])  # ALLOWED ACTIONS FOT THE AGENT'S QUEEN CONSIDERING ALSO THE OTHER PIECES
+            [n_grid, n_grid]
+        )  # ALLOWED ACTIONS FOT THE AGENT'S QUEEN CONSIDERING ALSO THE OTHER PIECES
 
         # ALLOWED ACTIONS OF THE AGENT'S KING (CONSIDERING OTHER PIECES), ONE-HOT ENCODED
         self.ak1 = np.zeros([8])
@@ -42,21 +48,17 @@ class ChessEnv:
         self.possible_king_a = np.shape(self.ak1)[0]
 
         self.aq1 = np.zeros(
-            [8 * (self.N_grid - 1)])  # ALLOWED ACTIONS OF THE AGENT'S QUEEN (CONSIDERING OTHER PIECES), ONE-HOT ENCODED
+            [8 * (self.N_grid - 1)]
+        )  # ALLOWED ACTIONS OF THE AGENT'S QUEEN (CONSIDERING OTHER PIECES), ONE-HOT ENCODED
         # TOTAL NUMBER OF POSSIBLE ACTIONS FOR AGENT'S QUEEN
         self.possible_queen_a = np.shape(self.aq1)[0]
 
         self.check = 0  # 1 (0) IF ENEMY KING (NOT) IN CHECK
 
         # THIS MAP IS USEFUL FOR US TO UNDERSTAND THE DIRECTION OF MOVEMENT GIVEN THE ACTION MADE (SKIP...)
-        self.map = np.array([[1, 0],
-                             [-1, 0],
-                             [0, 1],
-                             [0, -1],
-                             [1, 1],
-                             [1, -1],
-                             [-1, 1],
-                             [-1, -1]])
+        self.map = np.array(
+            [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+        )
 
     def initialise_game(self):
         """
@@ -84,20 +86,22 @@ class ChessEnv:
 
         # START THE GAME BY SETTING PIECIES
 
-        self.Board, self.p_k2, self.p_k1, self.p_q1 = generate_game(
-            self.N_grid)
+        self.Board, self.p_k2, self.p_k1, self.p_q1 = generate_game(self.N_grid)
 
         # Allowed actions for the agent's king
         self.dfk1_constrain, self.a_k1, self.dfk1 = degree_freedom_king1(
-            self.p_k1, self.p_k2, self.p_q1, self.Board)
+            self.p_k1, self.p_k2, self.p_q1, self.Board
+        )
 
         # Allowed actions for the agent's queen
         self.dfq1_constrain, self.a_q1, self.dfq1 = degree_freedom_queen(
-            self.p_k1, self.p_k2, self.p_q1, self.Board)
+            self.p_k1, self.p_k2, self.p_q1, self.Board
+        )
 
         # Allowed actions for the enemy's king
-        self.dfk2_constrain, self.a_k2, self.check = degree_freedom_king2(self.dfk1, self.p_k2, self.dfq1, self.Board,
-                                                                          self.p_k1)
+        self.dfk2_constrain, self.a_k2, self.check = degree_freedom_king2(
+            self.dfk1, self.p_k2, self.dfq1, self.Board, self.p_k1
+        )
 
         # ALLOWED ACTIONS FOR THE AGENT, ONE-HOT ENCODED
         allowed_a = np.concatenate([self.a_q1, self.a_k1], 0)
@@ -132,8 +136,7 @@ class ChessEnv:
         if agent_action < self.possible_queen_a:  # THE AGENT MOVED ITS QUEEN
 
             # UPDATE QUEEN'S POSITION
-            direction = int(
-                np.ceil((agent_action + 1) / (self.N_grid - 1))) - 1
+            direction = int(np.ceil((agent_action + 1) / (self.N_grid - 1))) - 1
             steps = agent_action - direction * (self.N_grid - 1) + 1
 
             self.Board[self.p_q1[0], self.p_q1[1]] = 0
@@ -158,20 +161,26 @@ class ChessEnv:
         # COMPUTE THE ALLOWED ACTIONS AFTER AGENT'S ACTION
         # Allowed actions for the agent's king
         self.dfk1_constrain, self.a_k1, self.dfk1 = degree_freedom_king1(
-            self.p_k1, self.p_k2, self.p_q1, self.Board)
+            self.p_k1, self.p_k2, self.p_q1, self.Board
+        )
 
         # Allowed actions for the agent's queen
         self.dfq1_constrain, self.a_q1, self.dfq1 = degree_freedom_queen(
-            self.p_k1, self.p_k2, self.p_q1, self.Board)
+            self.p_k1, self.p_k2, self.p_q1, self.Board
+        )
 
         # Allowed actions for the enemy's king
-        self.dfk2_constrain, self.a_k2, self.check = degree_freedom_king2(self.dfk1, self.p_k2, self.dfq1, self.Board,
-                                                                          self.p_k1)
+        self.dfk2_constrain, self.a_k2, self.check = degree_freedom_king2(
+            self.dfk1, self.p_k2, self.dfq1, self.Board, self.p_k1
+        )
 
         # CHECK IF POSITION IS A CHECMATE, DRAW, OR THE GAME CONTINUES
 
         # CASE OF CHECKMATE
-        if np.sum(self.dfk2_constrain) == 0 and self.dfq1[self.p_k2[0], self.p_k2[1]] == 1:
+        if (
+            np.sum(self.dfk2_constrain) == 0
+            and self.dfq1[self.p_k2[0], self.p_k2[1]] == 1
+        ):
 
             # King 2 has no freedom and it is checked
             # Checkmate and collect reward
@@ -181,7 +190,10 @@ class ChessEnv:
             X = []  # Features set to nothing (end of the episode)
 
         # CASE OF DRAW
-        elif np.sum(self.dfk2_constrain) == 0 and self.dfq1[self.p_k2[0], self.p_k2[1]] == 0:
+        elif (
+            np.sum(self.dfk2_constrain) == 0
+            and self.dfq1[self.p_k2[0], self.p_k2[1]] == 0
+        ):
 
             # King 2 has no freedom but it is not checked
             Done = 1  # The epsiode ends
@@ -193,8 +205,7 @@ class ChessEnv:
         else:
             # THE OPPONENT MOVES THE KING IN A RANDOM SAFE LOCATION
             allowed_enemy_a = np.where(self.a_k2 > 0)[0]
-            a_help = int(np.ceil(np.random.rand() *
-                         allowed_enemy_a.shape[0]) - 1)
+            a_help = int(np.ceil(np.random.rand() * allowed_enemy_a.shape[0]) - 1)
             a_enemy = allowed_enemy_a[a_help]
 
             direction = a_enemy
@@ -209,16 +220,19 @@ class ChessEnv:
 
             # COMPUTE THE ALLOWED ACTIONS AFTER THE OPPONENT'S ACTION
             # Possible actions of the King
-            self.dfk1_constrain, self.a_k1, self.dfk1 = degree_freedom_king1(self.p_k1, self.p_k2, self.p_q1,
-                                                                             self.Board)
+            self.dfk1_constrain, self.a_k1, self.dfk1 = degree_freedom_king1(
+                self.p_k1, self.p_k2, self.p_q1, self.Board
+            )
 
             # Allowed actions for the agent's king
-            self.dfq1_constrain, self.a_q1, self.dfq1 = degree_freedom_queen(self.p_k1, self.p_k2, self.p_q1,
-                                                                             self.Board)
+            self.dfq1_constrain, self.a_q1, self.dfq1 = degree_freedom_queen(
+                self.p_k1, self.p_k2, self.p_q1, self.Board
+            )
 
             # Allowed actions for the enemy's king
-            self.dfk2_constrain, self.a_k2, self.check = degree_freedom_king2(self.dfk1, self.p_k2, self.dfq1,
-                                                                              self.Board, self.p_k1)
+            self.dfk2_constrain, self.a_k2, self.check = degree_freedom_king2(
+                self.dfk1, self.p_k2, self.dfq1, self.Board, self.p_k1
+            )
 
             # ALLOWED ACTIONS FOR THE AGENT, ONE-HOT ENCODED
             allowed_a = np.concatenate([self.a_q1, self.a_k1], 0)
@@ -231,12 +245,15 @@ class ChessEnv:
         """
         Features. Given the chessboard position, the method computes the features.
         """
-        s_k1 = np.array(self.Board == 1).astype(
-            float).reshape(-1)  # FEATURES FOR KING POSITION
-        s_q1 = np.array(self.Board == 2).astype(
-            float).reshape(-1)  # FEATURES FOR QUEEN POSITION
-        s_k2 = np.array(self.Board == 3).astype(
-            float).reshape(-1)  # FEATURE FOR ENEMY'S KING POSITION
+        s_k1 = (
+            np.array(self.Board == 1).astype(float).reshape(-1)
+        )  # FEATURES FOR KING POSITION
+        s_q1 = (
+            np.array(self.Board == 2).astype(float).reshape(-1)
+        )  # FEATURES FOR QUEEN POSITION
+        s_k2 = (
+            np.array(self.Board == 3).astype(float).reshape(-1)
+        )  # FEATURE FOR ENEMY'S KING POSITION
 
         check = np.zeros([2])  # CHECK? FEATURE
         check[self.check] = 1
