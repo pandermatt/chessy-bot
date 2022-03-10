@@ -1,6 +1,8 @@
-from chess_env import *
-from Neural_net import SARSA_NN, QLEARNING_NN
 import matplotlib.pyplot as plt
+
+from chess_env import *
+from Neural_net import QLEARNING_NN
+from Neural_net import SARSA_NN
 
 size_board = 4
 
@@ -11,22 +13,25 @@ def print_first_five(env):
 
     print(S)  # PRINT CHESS BOARD (SEE THE DESCRIPTION ABOVE)
 
-    print('check? ', env.check)  # PRINT VARIABLE THAT TELLS IF ENEMY KING IS IN CHECK (1) OR NOT (0)
-    print('dofk2 ',
-          np.sum(env.dfk2_constrain).astype(int))  # PRINT THE NUMBER OF LOCATIONS THAT THE ENEMY KING CAN MOVE TO
+    # PRINT VARIABLE THAT TELLS IF ENEMY KING IS IN CHECK (1) OR NOT (0)
+    print("check? ", env.check)
+    print("dofk2 ",
+          np.sum(env.dfk2_constrain).astype(int)
+          )  # PRINT THE NUMBER OF LOCATIONS THAT THE ENEMY KING CAN MOVE TO
 
     for i in range(5):
         a, _ = np.where(allowed_a == 1)  # FIND WHAT THE ALLOWED ACTIONS ARE
         a_agent = np.random.permutation(a)[0]  # MAKE A RANDOM ACTION
 
-        S, X, allowed_a, R, Done = env.one_step(a_agent)  # UPDATE THE ENVIRONMENT
+        S, X, allowed_a, R, Done = env.one_step(
+            a_agent)  # UPDATE THE ENVIRONMENT
 
         # PRINT CHESS BOARD AND VARIABLES
-        print('')
+        print("")
         print(S)
-        print(R, '', Done)
-        print('check? ', env.check)
-        print('dofk2 ', np.sum(env.dfk2_constrain).astype(int))
+        print(R, "", Done)
+        print("check? ", env.check)
+        print("dofk2 ", np.sum(env.dfk2_constrain).astype(int))
 
         # TERMINATE THE EPISODE IF Done=True (DRAW OR CHECKMATE)
         if Done:
@@ -52,7 +57,8 @@ def perform_random_agent(env, N_episodes=1000):
             a, _ = np.where(allowed_actions == 1)
             current_action = np.random.permutation(a)[0]
 
-            board_state, X, allowed_actions, R, done = env.one_step(current_action)
+            board_state, X, allowed_actions, R, done = env.one_step(
+                current_action)
 
             if done:
                 R_save_random[n] = np.copy(R)
@@ -65,9 +71,14 @@ def perform_random_agent(env, N_episodes=1000):
     # SINCE THE MAJORITY OF THE POSITIONS END WITH A DRAW
     # (THE ENEMY KING IS NOT IN CHECK AND CAN'T MOVE)
 
-    print('Random Agent, Average reward:', np.mean(R_save_random),
-          'Number of steps: ', np.mean(N_moves_save_random),
-          'Number of checkmates: ', np.count_nonzero(checkmate_save == 1))
+    print(
+        "Random Agent, Average reward:",
+        np.mean(R_save_random),
+        "Number of steps: ",
+        np.mean(N_moves_save_random),
+        "Number of checkmates: ",
+        np.count_nonzero(checkmate_save == 1),
+    )
 
 
 def perform_nerual_network(env):
@@ -94,26 +105,27 @@ def perform_nerual_network(env):
     print_stats(N_episodes, name1, reward1, moves1, name2, reward2, moves2)
 
 
-def print_stats(n_episodes, name1, r_save1, step_save1, name2, r_save2, step_save2):
+def print_stats(n_episodes, name1, r_save1, step_save1, name2, r_save2,
+                step_save2):
     episodes = range(n_episodes)
     plt.subplots_adjust(wspace=1, hspace=0.3)
 
     plt.subplot(2, 1, 1)
     plt.plot(episodes, r_save1, label=name1)
     plt.plot(episodes, r_save2, label=name2)
-    plt.title(f'Avg. Rewards')
+    plt.title(f"Avg. Rewards")
     plt.legend()
 
     plt.subplot(2, 1, 2)
     plt.plot(episodes, step_save1, label=name1)
     plt.plot(episodes, step_save2, label=name2)
-    plt.title(f'Avg. Steps ')
+    plt.title(f"Avg. Steps ")
     plt.legend()
 
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     chess_env = ChessEnv(size_board)
 
     # print(f"===== First 5 Steps =====")

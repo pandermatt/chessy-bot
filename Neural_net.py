@@ -1,21 +1,22 @@
 # Import
+import pickle
+import random
 
 import numpy as np
 import numpy.matlib
-import random
-from degree_freedom import degree_freedom_queen
+
+from Adam import Adam
+from chess_env import ChessEnv
 from degree_freedom import degree_freedom_king1
 from degree_freedom import degree_freedom_king2
+from degree_freedom import degree_freedom_queen
 from generate_game import *
-from chess_env import ChessEnv
-import pickle
-from Adam import Adam
-
 
 # input_layer_size = 10
 # first_hidden_layer_size = 15
 # output_layer_size = x
 # input: layer_sizes = [input_layer_size, first_hidden_layer_size, ..., output_layer_size]
+
 
 def epsilongreedy_policy(Qvalues, a, epsilon):
     if np.random.uniform(0, 1) < epsilon:
@@ -30,11 +31,13 @@ def epsilongreedy_policy(Qvalues, a, epsilon):
 
 
 class Neural_net:
+
     def __init__(self, env, layer_sizes, xavier=False):
         self._name = "chessy bot"
         self.env = env
         self.epsilon_0 = 0.25  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
-        self.beta = 0.00005  # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
+        # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
+        self.beta = 0.00005
         self.gamma = 0.9  # THE DISCOUNT FACTOR
         self.eta = 0.005  # THE LEARNING RATE
         self.beta_adam = 0.9
@@ -46,12 +49,18 @@ class Neural_net:
         for idx in range(len(layer_sizes) - 1):
             if xavier:
                 self.weights.append(
-                    np.random.randn(layer_sizes[idx + 1], layer_sizes[idx]) * np.sqrt(1 / (layer_sizes[idx])))
+                    np.random.randn(layer_sizes[idx + 1], layer_sizes[idx]) *
+                    np.sqrt(1 / (layer_sizes[idx])))
             else:
-                self.weights.append(np.random.uniform(0, 1, (layer_sizes[idx + 1], layer_sizes[idx])))
-                self.weights[idx] = np.divide(self.weights[idx],
-                                              np.tile(np.sum(self.weights[idx], 1)[:, None], (1,
-                                                                                              layer_sizes[idx])))
+                self.weights.append(
+                    np.random.uniform(
+                        0, 1, (layer_sizes[idx + 1], layer_sizes[idx])))
+                self.weights[idx] = np.divide(
+                    self.weights[idx],
+                    np.tile(
+                        np.sum(self.weights[idx], 1)[:, None],
+                        (1, layer_sizes[idx])),
+                )
 
             self.biases.append(np.zeros((layer_sizes[idx + 1])))
 
@@ -90,16 +99,21 @@ class Neural_net:
                 if Done == 1:
                     e_n = self._error_func_done(R, qvalue, action_taken)
                 else:
-                    e_n = self._error_func_not_done(R, qvalue, qvalue_next, action_taken)
+                    e_n = self._error_func_not_done(R, qvalue, qvalue_next,
+                                                    action_taken)
                 delta = x[-1] * (1 - x[-1]) * e_n
             else:
-                delta = x[-(idx + 1)] * (1 - x[-(idx + 1)]) * np.dot(np.transpose(self.weights[-idx]), delta)
+                delta = (x[-(idx + 1)] * (1 - x[-(idx + 1)]) *
+                         np.dot(np.transpose(self.weights[-idx]), delta))
             dweights[-(idx + 1)] += np.outer(delta, x[-(idx + 2)])
             dbiases[-(idx + 1)] += delta
 
         for idx in range(len(self.weights)):
-            self.weights[idx] += self.eta * self.adam_w[idx].Compute(dweights[idx]) * x[idx]
-            self.biases[idx] += self.eta * self.adam_b[idx].Compute(dbiases[idx])
+            self.weights[idx] += (self.eta *
+                                  self.adam_w[idx].Compute(dweights[idx]) *
+                                  x[idx])
+            self.biases[idx] += self.eta * self.adam_b[idx].Compute(
+                dbiases[idx])
 
     def _error_func_done(self, R, qvalue, action_taken):
         return (R - qvalue) * action_taken
@@ -120,26 +134,34 @@ class Neural_net:
         interm_output_nr = 1000
 
         for n in range(N_episodes):
-            epsilon_f = self.epsilon_0 / (1 + self.beta * n)  ## DECAYING EPSILON
-            Done = 0  ## SET DONE TO ZERO (BEGINNING OF THE EPISODE)
+            epsilon_f = self.epsilon_0 / (1 + self.beta * n
+                                          )  # DECAYING EPSILON
+            Done = 0  # SET DONE TO ZERO (BEGINNING OF THE EPISODE)
             move_counter = 1  # COUNTER FOR NUMBER OF ACTIONS
 
             S, X, allowed_a = self.env.initialise_game()
 
             if n % interm_output_nr == 0 and n > 0:
                 print(f"Epoche ({n}/{N_episodes})")
-                print(f'{self._name} Average reward:', np.mean(R_save[(n - interm_output_nr):n]),
-                      'Number of steps: ', np.mean(N_moves_save[(n - interm_output_nr):n]),
-                      'Number of checkmates: ', np.count_nonzero(checkmate_save[(n - interm_output_nr):n] > 0))
+                print(
+                    f"{self._name} Average reward:",
+                    np.mean(R_save[(n - interm_output_nr):n]),
+                    "Number of steps: ",
+                    np.mean(N_moves_save[(n - interm_output_nr):n]),
+                    "Number of checkmates: ",
+                    np.count_nonzero(
+                        checkmate_save[(n - interm_output_nr):n] > 0),
+                )
 
             while Done == 0:
                 a, _ = np.where(allowed_a == 1)
                 x = self._forward_pass(X)
                 a_agent, qvalue = epsilongreedy_policy(x[-1], a, epsilon_f)
 
-                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
+                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(
+                    a_agent)
 
-                ## THE EPISODE HAS ENDED, UPDATE... BE CAREFUL, THIS IS THE LAST STEP OF THE EPISODE
+                # THE EPISODE HAS ENDED, UPDATE... BE CAREFUL, THIS IS THE LAST STEP OF THE EPISODE
                 if Done == 1:
 
                     R_save[n] = np.copy(R)
@@ -162,7 +184,8 @@ class Neural_net:
                     # Compute the delta
                     a_next, _ = np.where(allowed_a_next == 1)
                     x_next = self._forward_pass(X_next)
-                    a_agent_next, qvalue_next = self._call_epsilongreedy(x_next[-1], a_next, epsilon_f)
+                    a_agent_next, qvalue_next = self._call_epsilongreedy(
+                        x_next[-1], a_next, epsilon_f)
 
                     self._backprop(x, a, R, qvalue, Done, qvalue_next)
 
@@ -173,13 +196,14 @@ class Neural_net:
 
                 move_counter += 1  # UPDATE COUNTER FOR NUMBER OF ACTIONS
 
-        print(f'{self._name}, Average reward: {np.mean(R_save)}\n'
-              f'Number of steps: {np.mean(N_moves_save)}\n'
-              f'Checkmates: {np.count_nonzero(checkmate_save > 0)}')
+        print(f"{self._name}, Average reward: {np.mean(R_save)}\n"
+              f"Number of steps: {np.mean(N_moves_save)}\n"
+              f"Checkmates: {np.count_nonzero(checkmate_save > 0)}")
         return self._name, avg_reward, avg_moves
 
 
 class SARSA_NN(Neural_net):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._name = "SARSA BOT"
@@ -189,6 +213,7 @@ class SARSA_NN(Neural_net):
 
 
 class QLEARNING_NN(Neural_net):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._name = "QLEARNING BOT"
