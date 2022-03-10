@@ -1,8 +1,4 @@
-import matplotlib.pyplot as plt
-
 from chess_env import *
-from neural_net import QLEARNING_NN
-from neural_net import SARSA_NN
 from chessy_agent import ChessyAgent
 
 size_board = 4
@@ -80,7 +76,6 @@ def perform_random_agent(env, N_episodes=1000):
         "Number of checkmates: ",
         np.count_nonzero(checkmate_save == 1),
     )
-
 
 
 if __name__ == '__main__':
