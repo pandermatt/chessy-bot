@@ -1,15 +1,14 @@
 # Import
-import pickle
 import math
+import pickle
 import random
 
 import numpy.matlib
-
 from Adam import Adam
+
 from chess_env import ChessEnv
-from degree_freedom import degree_freedom_king1
-from degree_freedom import degree_freedom_king2
-from degree_freedom import degree_freedom_queen
+from degree_freedom import (degree_freedom_king1, degree_freedom_king2,
+                            degree_freedom_queen)
 from generate_game import *
 
 # input_layer_size = 10
