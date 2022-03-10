@@ -1,5 +1,6 @@
 from chess_env import *
-from Neural_net import Neural_net
+from Neural_net import SARSA_NN, QLEARNING_NN
+import matplotlib.pyplot as plt
 
 size_board = 4
 
@@ -40,6 +41,7 @@ def perform_random_agent(env, N_episodes=1000):
 
     R_save_random = np.zeros([N_episodes, 1])
     N_moves_save_random = np.zeros([N_episodes, 1])
+    checkmate_save = np.zeros(N_episodes)
 
     for n in range(N_episodes):
         board_state, X, allowed_actions = env.initialise_game()
@@ -63,7 +65,9 @@ def perform_random_agent(env, N_episodes=1000):
     # SINCE THE MAJORITY OF THE POSITIONS END WITH A DRAW
     # (THE ENEMY KING IS NOT IN CHECK AND CAN'T MOVE)
 
-    print('Random Agent, Average reward:', np.mean(R_save_random), 'Number of steps: ', np.mean(N_moves_save_random))
+    print('Random Agent, Average reward:', np.mean(R_save_random),
+          'Number of steps: ', np.mean(N_moves_save_random),
+          'Number of checkmates: ', np.count_nonzero(checkmate_save == 1))
 
 
 def perform_nerual_network(env):
@@ -79,21 +83,44 @@ def perform_nerual_network(env):
 
     # INITALISE YOUR NEURAL NETWORK...
     # HYPERPARAMETERS SUGGESTED (FOR A GRID SIZE OF 4)
-    nn = Neural_net(env, [N_in, N_h1, N_a], xavier=True)
+    sarsa = SARSA_NN(env, [N_in, N_h1, N_a], xavier=True)
+    qlearning = QLEARNING_NN(env, [N_in, N_h1, N_a], xavier=True)
 
-    N_episodes = 300000  # THE NUMBER OF GAMES TO BE PLAYED
+    N_episodes = 100  # THE NUMBER OF GAMES TO BE PLAYED
 
-    nn.train(N_episodes)
+    name1, reward1, moves1 = sarsa.train(N_episodes)
+    name2, reward2, moves2 = qlearning.train(N_episodes)
+
+    print_stats(N_episodes, name1, reward1, moves1, name2, reward2, moves2)
+
+
+def print_stats(n_episodes, name1, r_save1, step_save1, name2, r_save2, step_save2):
+    episodes = range(n_episodes)
+    plt.subplots_adjust(wspace=1, hspace=0.3)
+
+    plt.subplot(2, 1, 1)
+    plt.plot(episodes, r_save1, label=name1)
+    plt.plot(episodes, r_save2, label=name2)
+    plt.title(f'Avg. Rewards')
+    plt.legend()
+
+    plt.subplot(2, 1, 2)
+    plt.plot(episodes, step_save1, label=name1)
+    plt.plot(episodes, step_save2, label=name2)
+    plt.title(f'Avg. Steps ')
+    plt.legend()
+
+    plt.show()
 
 
 if __name__ == '__main__':
     chess_env = ChessEnv(size_board)
 
-    print(f"===== First 5 Steps =====")
-    print_first_five(chess_env)
-
-    print(f"===== Random Agent =====")
-    perform_random_agent(chess_env)
+    # print(f"===== First 5 Steps =====")
+    # print_first_five(chess_env)
+    #
+    # print(f"===== Random Agent =====")
+    # perform_random_agent(chess_env)
 
     print(f"===== Neural Network =====")
     perform_nerual_network(chess_env)

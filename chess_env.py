@@ -6,6 +6,10 @@ class ChessEnv:
 
     def __init__(self, n_grid):
 
+        self.reward_step = -0.05
+        self.reward_draw = -10
+        self.reward_checkmate = 50
+
         self.N_grid = n_grid  # SIZE OF THE BOARD
 
         self.Board = np.zeros([n_grid,
@@ -110,7 +114,7 @@ class ChessEnv:
         """
 
         # SET REWARD TO ZERO IF GAME IS NOT ENDED
-        R = 0
+        R = self.reward_step
         # SET Done TO ZERO (GAME NOT ENDED)
         Done = 0
 
@@ -160,7 +164,7 @@ class ChessEnv:
             # King 2 has no freedom and it is checked
             # Checkmate and collect reward
             Done = 1  # The epsiode ends
-            R = 1  # Reward for checkmate
+            R = self.reward_checkmate  # Reward for checkmate
             allowed_a = []  # Allowed_a set to nothing (end of the episode)
             X = []  # Features set to nothing (end of the episode)
 
@@ -169,7 +173,7 @@ class ChessEnv:
 
             # King 2 has no freedom but it is not checked
             Done = 1  # The epsiode ends
-            R = 0.  # Reward for draw
+            R = self.reward_draw  # Reward for draw
             allowed_a = []  # Allowed_a set to nothing (end of the episode)
             X = []  # Features set to nothing (end of the episode)
 
