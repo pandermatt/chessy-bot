@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from chess_env import *
 from Neural_net import QLEARNING_NN
 from Neural_net import SARSA_NN
+from chessy_agent import ChessyAgent
 
 size_board = 4
 
@@ -81,6 +82,7 @@ def perform_random_agent(env, N_episodes=1000):
     )
 
 
+
 def perform_nerual_network(env):
     # INITIALISE THE PARAMETERS OF YOUR NEURAL NETWORK AND...
     # PLEASE CONSIDER USING A MASK OF ONE FOR THE ACTION MADE
@@ -125,14 +127,14 @@ def print_stats(n_episodes, name1, r_save1, step_save1, name2, r_save2,
     plt.show()
 
 
-if __name__ == "__main__":
-    chess_env = ChessEnv(size_board)
+if __name__ == '__main__':
+    board_size = 4
 
-    # print(f"===== First 5 Steps =====")
-    # print_first_five(chess_env)
-    #
-    # print(f"===== Random Agent =====")
-    # perform_random_agent(chess_env)
+    print(f"===== First 5 Steps =====")
+    print_first_five(ChessEnv(board_size))
+
+    print(f"===== Random Agent =====")
+    perform_random_agent(ChessEnv(board_size))
 
     print(f"===== Neural Network =====")
-    perform_nerual_network(chess_env)
+    ChessyAgent(board_size).run(lambda *args: None)

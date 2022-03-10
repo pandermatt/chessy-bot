@@ -1,8 +1,8 @@
 # Import
 import pickle
+import math
 import random
 
-import numpy as np
 import numpy.matlib
 
 from Adam import Adam
@@ -30,8 +30,7 @@ def epsilongreedy_policy(Qvalues, a, epsilon):
     return a, qvalue
 
 
-class Neural_net:
-
+class NeuralNet:
     def __init__(self, env, layer_sizes, xavier=False):
         self._name = "chessy bot"
         self.env = env
@@ -124,14 +123,15 @@ class Neural_net:
     def _call_epsilongreedy(self, param, a_next, epsilon_f):
         return epsilongreedy_policy(param, a_next, epsilon_f)
 
-    def train(self, N_episodes):
+    def train(self, N_episodes, callback):
         R_save = np.zeros([N_episodes, 1])
         avg_reward = np.zeros(N_episodes)
         checkmate_save = np.zeros(N_episodes)
         N_moves_save = np.zeros([N_episodes, 1])
         avg_moves = np.zeros(N_episodes)
 
-        interm_output_nr = 1000
+        intern_output_nr = 1000
+        web_output_nr = 10
 
         for n in range(N_episodes):
             epsilon_f = self.epsilon_0 / (1 + self.beta * n
@@ -141,17 +141,11 @@ class Neural_net:
 
             S, X, allowed_a = self.env.initialise_game()
 
-            if n % interm_output_nr == 0 and n > 0:
+            if n % intern_output_nr == 0 and n > 0:
                 print(f"Epoche ({n}/{N_episodes})")
-                print(
-                    f"{self._name} Average reward:",
-                    np.mean(R_save[(n - interm_output_nr):n]),
-                    "Number of steps: ",
-                    np.mean(N_moves_save[(n - interm_output_nr):n]),
-                    "Number of checkmates: ",
-                    np.count_nonzero(
-                        checkmate_save[(n - interm_output_nr):n] > 0),
-                )
+                
+                print('Chessy Agent, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
+                      'Number of steps: ', np.mean(N_moves_save[(n - intern_output_nr):n]))
 
             while Done == 0:
                 a, _ = np.where(allowed_a == 1)
@@ -195,6 +189,15 @@ class Neural_net:
                 allowed_a = np.copy(allowed_a_next)
 
                 move_counter += 1  # UPDATE COUNTER FOR NUMBER OF ACTIONS
+                
+            if n % web_output_nr == 0:
+                callback({'board': self.calculate_location(S),
+                          'epoche_string': f"{n}/{N_episodes}",
+                          'average_reward': np.mean(R_save[(n - intern_output_nr):n]),
+                          'num_of_steps': np.mean(N_moves_save[(n - intern_output_nr):n]),
+                          'percentage': f"{n / N_episodes * 100}%",
+                          'percentage_label': f"{math.ceil(n / N_episodes * 100)}%"
+                          })
 
         print(f"{self._name}, Average reward: {np.mean(R_save)}\n"
               f"Number of steps: {np.mean(N_moves_save)}\n"
@@ -220,3 +223,17 @@ class QLEARNING_NN(Neural_net):
 
     def _call_epsilongreedy(self, param, a_next, epsilon_f):
         return epsilongreedy_policy(param, a_next, 0)
+
+def calculate_location(self, S):
+    board = np.array(S)
+    board_location = {
+        self.convert_location_to_letters(board, 1): 'wK',  # 1 = location of the King bK
+        self.convert_location_to_letters(board, 2): 'wQ',  # 2 = location of the Queen wQ
+        self.convert_location_to_letters(board, 3): 'bK',  # 3 = location fo the Enemy King wK
+    }
+    return board_location
+
+@staticmethod
+def convert_location_to_letters(board, figure_id):
+    match = np.where(board == figure_id)
+    return f"{chr(97 + match[0][0])}{match[1][0] + 1}"
