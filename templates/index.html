@@ -5,8 +5,14 @@
 
 {% include "chess_board.html" %}
 
-<h3 class="mt-4 mb-2">End State of one Epoch</h3>
-<div id="myBoard" style="width: 100%; margin: auto"></div>
+<h3 class="mt-4 mb-2">
+    End State of one Epoch
+</h3>
+<div class="position-relative">
+    <div id="myBoard" style="width: 100%; margin: auto"></div>
+    <div class="position-absolute chess-border"></div>
+    <span class="position-absolute badge rounded-pill bg-secondary chess-label">4x4 chessboard size (A1 to D4)</span>
+</div>
 
 <p class="text-muted mx-auto" style="max-width: 400px; font-style: italic">
     Click on the board to refresh it. Due to performance reason, it will only refresh every 2 seconds
@@ -25,6 +31,24 @@
         board.position(JSON.parse(position));
     }, 2000);
 </script>
+
+<style>
+    .chess-border {
+        border-right: 10px solid #1C3144;
+        border-top: 10px solid #1C3144;
+        width: 348px;
+        position: absolute;
+        height: 348px;
+        top: 328px;
+        pointer-events: none;
+    }
+
+    .chess-label {
+        top: 310px;
+        left: 170px;
+        pointer-events: none;
+    }
+</style>
 
 
 {% endblock %}
