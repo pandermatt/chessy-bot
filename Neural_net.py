@@ -31,6 +31,7 @@ def epsilongreedy_policy(Qvalues, a, epsilon):
 
 
 class NeuralNet:
+
     def __init__(self, env, layer_sizes, xavier=False):
         self._name = "chessy bot"
         self.env = env
@@ -48,18 +49,17 @@ class NeuralNet:
         for idx in range(len(layer_sizes) - 1):
             if xavier:
                 self.weights.append(
-                    np.random.randn(layer_sizes[idx + 1], layer_sizes[idx])
-                    * np.sqrt(1 / (layer_sizes[idx]))
-                )
+                    np.random.randn(layer_sizes[idx + 1], layer_sizes[idx]) *
+                    np.sqrt(1 / (layer_sizes[idx])))
             else:
                 self.weights.append(
-                    np.random.uniform(0, 1, (layer_sizes[idx + 1], layer_sizes[idx]))
-                )
+                    np.random.uniform(
+                        0, 1, (layer_sizes[idx + 1], layer_sizes[idx])))
                 self.weights[idx] = np.divide(
                     self.weights[idx],
                     np.tile(
-                        np.sum(self.weights[idx], 1)[:, None], (1, layer_sizes[idx])
-                    ),
+                        np.sum(self.weights[idx], 1)[:, None],
+                        (1, layer_sizes[idx])),
                 )
 
             self.biases.append(np.zeros((layer_sizes[idx + 1])))
@@ -99,24 +99,21 @@ class NeuralNet:
                 if Done == 1:
                     e_n = self._error_func_done(R, qvalue, action_taken)
                 else:
-                    e_n = self._error_func_not_done(
-                        R, qvalue, qvalue_next, action_taken
-                    )
+                    e_n = self._error_func_not_done(R, qvalue, qvalue_next,
+                                                    action_taken)
                 delta = x[-1] * (1 - x[-1]) * e_n
             else:
-                delta = (
-                    x[-(idx + 1)]
-                    * (1 - x[-(idx + 1)])
-                    * np.dot(np.transpose(self.weights[-idx]), delta)
-                )
+                delta = (x[-(idx + 1)] * (1 - x[-(idx + 1)]) *
+                         np.dot(np.transpose(self.weights[-idx]), delta))
             dweights[-(idx + 1)] += np.outer(delta, x[-(idx + 2)])
             dbiases[-(idx + 1)] += delta
 
         for idx in range(len(self.weights)):
-            self.weights[idx] += (
-                self.eta * self.adam_w[idx].Compute(dweights[idx]) * x[idx]
-            )
-            self.biases[idx] += self.eta * self.adam_b[idx].Compute(dbiases[idx])
+            self.weights[idx] += (self.eta *
+                                  self.adam_w[idx].Compute(dweights[idx]) *
+                                  x[idx])
+            self.biases[idx] += self.eta * self.adam_b[idx].Compute(
+                dbiases[idx])
 
     def _error_func_done(self, R, qvalue, action_taken):
         return (R - qvalue) * action_taken
@@ -138,7 +135,8 @@ class NeuralNet:
         web_output_nr = 10
 
         for n in range(N_episodes):
-            epsilon_f = self.epsilon_0 / (1 + self.beta * n)  # DECAYING EPSILON
+            epsilon_f = self.epsilon_0 / (1 + self.beta * n
+                                          )  # DECAYING EPSILON
             Done = 0  # SET DONE TO ZERO (BEGINNING OF THE EPISODE)
             move_counter = 1  # COUNTER FOR NUMBER OF ACTIONS
 
@@ -149,9 +147,9 @@ class NeuralNet:
 
                 print(
                     "Chessy Agent, Average reward:",
-                    np.mean(R_save[(n - intern_output_nr) : n]),
+                    np.mean(R_save[(n - intern_output_nr):n]),
                     "Number of steps: ",
-                    np.mean(N_moves_save[(n - intern_output_nr) : n]),
+                    np.mean(N_moves_save[(n - intern_output_nr):n]),
                 )
 
             while Done == 0:
@@ -159,7 +157,8 @@ class NeuralNet:
                 x = self._forward_pass(X)
                 a_agent, qvalue = epsilongreedy_policy(x[-1], a, epsilon_f)
 
-                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
+                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(
+                    a_agent)
 
                 # THE EPISODE HAS ENDED, UPDATE... BE CAREFUL, THIS IS THE LAST STEP OF THE EPISODE
                 if Done == 1:
@@ -185,8 +184,7 @@ class NeuralNet:
                     a_next, _ = np.where(allowed_a_next == 1)
                     x_next = self._forward_pass(X_next)
                     a_agent_next, qvalue_next = self._call_epsilongreedy(
-                        x_next[-1], a_next, epsilon_f
-                    )
+                        x_next[-1], a_next, epsilon_f)
 
                     self._backprop(x, a, R, qvalue, Done, qvalue_next)
 
@@ -198,28 +196,29 @@ class NeuralNet:
                 move_counter += 1  # UPDATE COUNTER FOR NUMBER OF ACTIONS
 
             if n % web_output_nr == 0:
-                callback(
-                    {
-                        "board": self.calculate_location(S),
-                        "epoche_string": f"{n}/{N_episodes}",
-                        "average_reward": np.mean(R_save[(n - intern_output_nr) : n]),
-                        "num_of_steps": np.mean(
-                            N_moves_save[(n - intern_output_nr) : n]
-                        ),
-                        "percentage": f"{n / N_episodes * 100}%",
-                        "percentage_label": f"{math.ceil(n / N_episodes * 100)}%",
-                    }
-                )
+                callback({
+                    "board":
+                    self.calculate_location(S),
+                    "epoche_string":
+                    f"{n}/{N_episodes}",
+                    "average_reward":
+                    np.mean(R_save[(n - intern_output_nr):n]),
+                    "num_of_steps":
+                    np.mean(N_moves_save[(n - intern_output_nr):n]),
+                    "percentage":
+                    f"{n / N_episodes * 100}%",
+                    "percentage_label":
+                    f"{math.ceil(n / N_episodes * 100)}%",
+                })
 
-        print(
-            f"{self._name}, Average reward: {np.mean(R_save)}\n"
-            f"Number of steps: {np.mean(N_moves_save)}\n"
-            f"Checkmates: {np.count_nonzero(checkmate_save > 0)}"
-        )
+        print(f"{self._name}, Average reward: {np.mean(R_save)}\n"
+              f"Number of steps: {np.mean(N_moves_save)}\n"
+              f"Checkmates: {np.count_nonzero(checkmate_save > 0)}")
         return self._name, avg_reward, avg_moves
 
 
 class SARSA_NN(Neural_net):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._name = "SARSA BOT"
@@ -229,6 +228,7 @@ class SARSA_NN(Neural_net):
 
 
 class QLEARNING_NN(Neural_net):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._name = "QLEARNING BOT"
@@ -241,11 +241,14 @@ def calculate_location(self, S):
     board = np.array(S)
     board_location = {
         # 1 = location of the King bK
-        self.convert_location_to_letters(board, 1): "wK",
+        self.convert_location_to_letters(board, 1):
+        "wK",
         # 2 = location of the Queen wQ
-        self.convert_location_to_letters(board, 2): "wQ",
+        self.convert_location_to_letters(board, 2):
+        "wQ",
         # 3 = location fo the Enemy King wK
-        self.convert_location_to_letters(board, 3): "bK",
+        self.convert_location_to_letters(board, 3):
+        "bK",
     }
     return board_location
 
