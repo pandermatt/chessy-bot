@@ -143,7 +143,7 @@ class NeuralNet:
 
             if n % intern_output_nr == 0 and n > 0:
                 print(f"Epoche ({n}/{N_episodes})")
-                
+
                 print('Chessy Agent, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
                       'Number of steps: ', np.mean(N_moves_save[(n - intern_output_nr):n]))
 
@@ -189,7 +189,7 @@ class NeuralNet:
                 allowed_a = np.copy(allowed_a_next)
 
                 move_counter += 1  # UPDATE COUNTER FOR NUMBER OF ACTIONS
-                
+
             if n % web_output_nr == 0:
                 callback({'board': self.calculate_location(S),
                           'epoche_string': f"{n}/{N_episodes}",
@@ -224,14 +224,19 @@ class QLEARNING_NN(Neural_net):
     def _call_epsilongreedy(self, param, a_next, epsilon_f):
         return epsilongreedy_policy(param, a_next, 0)
 
+
 def calculate_location(self, S):
     board = np.array(S)
     board_location = {
-        self.convert_location_to_letters(board, 1): 'wK',  # 1 = location of the King bK
-        self.convert_location_to_letters(board, 2): 'wQ',  # 2 = location of the Queen wQ
-        self.convert_location_to_letters(board, 3): 'bK',  # 3 = location fo the Enemy King wK
+        # 1 = location of the King bK
+        self.convert_location_to_letters(board, 1): 'wK',
+        # 2 = location of the Queen wQ
+        self.convert_location_to_letters(board, 2): 'wQ',
+        # 3 = location fo the Enemy King wK
+        self.convert_location_to_letters(board, 3): 'bK',
     }
     return board_location
+
 
 @staticmethod
 def convert_location_to_letters(board, figure_id):

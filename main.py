@@ -82,7 +82,6 @@ def perform_random_agent(env, N_episodes=1000):
     )
 
 
-
 def perform_nerual_network(env):
     # INITIALISE THE PARAMETERS OF YOUR NEURAL NETWORK AND...
     # PLEASE CONSIDER USING A MASK OF ONE FOR THE ACTION MADE
