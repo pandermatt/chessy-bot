@@ -1,7 +1,13 @@
+import math
 import threading
 
+import numpy as np
 from flask import Flask, render_template
 from turbo_flask import Turbo
+
+from agents.chessy_agent import ChessyAgent
+from agents.first_five_agent import FirstFiveAgent
+from agents.random_agent import RandomAgent
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 turbo = Turbo(app)
@@ -25,12 +31,33 @@ def before_first_request():
 
 
 def update_load():
-    from chessy_agent import ChessyAgent
-
     with app.app_context():
-        def update_web(params):
+        def update_web(S, n, N_episodes, R_save, N_moves_save):
             global app_content
-            app_content = params
+            app_content = {'board': calculate_location(S),
+                           'epoche_string': f"{n}/{N_episodes}",
+                           'average_reward': np.mean(R_save[(n - 1000):n]),
+                           'num_of_steps': np.mean(N_moves_save[(n - 1000):n]),
+                           'percentage': f"{n / N_episodes * 100}%",
+                           'percentage_label': f"{math.ceil(n / N_episodes * 100)}%"
+                           }
             turbo.push(turbo.replace(render_template('chess_board.html'), 'load'))
 
+        FirstFiveAgent().run(update_web)
+        RandomAgent().run(update_web)
         ChessyAgent().run(update_web)
+
+
+def calculate_location(S):
+    board = np.array(S)
+    board_location = {
+        convert_location_to_letters(board, 1): 'wK',  # 1 = location of the King bK
+        convert_location_to_letters(board, 2): 'wQ',  # 2 = location of the Queen wQ
+        convert_location_to_letters(board, 3): 'bK',  # 3 = location fo the Enemy King wK
+    }
+    return board_location
+
+
+def convert_location_to_letters(board, figure_id):
+    match = np.where(board == figure_id)
+    return f"{chr(97 + match[0][0])}{match[1][0] + 1}"

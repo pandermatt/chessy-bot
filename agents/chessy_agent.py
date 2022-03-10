@@ -1,15 +1,14 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
-from chess_env import ChessEnv
+from agents.agent import Agent
 from neural_net import SARSA_NN, QLEARNING_NN
-import matplotlib.pyplot as plt
 
 
-class ChessyAgent:
-    def __init__(self, board_size=4):
-        self.env = ChessEnv(board_size)
+class ChessyAgent(Agent):
+    NAME = "ChessyAgent"
 
-    def run(self, callback):
+    def run(self, callback=lambda *args: None):
         # INITIALISE THE PARAMETERS OF YOUR NEURAL NETWORK AND...
         # PLEASE CONSIDER USING A MASK OF ONE FOR THE ACTION MADE
         # AND ZERO OTHERWISE IF YOU ARE NOT USING VANILLA GRADIENT DESCENT...
@@ -33,8 +32,7 @@ class ChessyAgent:
 
         self.print_stats(N_episodes, name1, reward1, moves1, name2, reward2, moves2)
 
-    def print_stats(self, n_episodes, name1, r_save1, step_save1, name2, r_save2,
-                    step_save2):
+    def print_stats(self, n_episodes, name1, r_save1, step_save1, name2, r_save2, step_save2):
         episodes = range(n_episodes)
         plt.subplots_adjust(wspace=1, hspace=0.3)
 

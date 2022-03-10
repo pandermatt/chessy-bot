@@ -1,6 +1,6 @@
 # Import
-import math
 import random
+
 from adam import Adam
 from generate_game import *
 
@@ -130,7 +130,7 @@ class NeuralNet:
 
             if n % intern_output_nr == 0 and n > 0:
                 print(f"Epoche ({n}/{N_episodes})")
-                
+
                 print(f'{self._name}, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
                       'Number of steps: ', np.mean(N_moves_save[(n - intern_output_nr):n]))
 
@@ -176,34 +176,14 @@ class NeuralNet:
                 allowed_a = np.copy(allowed_a_next)
 
                 move_counter += 1  # UPDATE COUNTER FOR NUMBER OF ACTIONS
-                
+
             if n % web_output_nr == 0:
-                callback({'board': self.calculate_location(S),
-                          'epoche_string': f"{n}/{N_episodes}",
-                          'average_reward': np.mean(R_save[(n - intern_output_nr):n]),
-                          'num_of_steps': np.mean(N_moves_save[(n - intern_output_nr):n]),
-                          'percentage': f"{n / N_episodes * 100}%",
-                          'percentage_label': f"{math.ceil(n / N_episodes * 100)}%"
-                          })
+                callback(S, n, N_episodes, R_save, N_moves_save)
 
         print(f"{self._name}, Average reward: {np.mean(R_save)}\n"
               f"Number of steps: {np.mean(N_moves_save)}\n"
               f"Checkmates: {np.count_nonzero(checkmate_save > 0)}")
         return self._name, avg_reward, avg_moves
-
-    def calculate_location(self, S):
-        board = np.array(S)
-        board_location = {
-            self.convert_location_to_letters(board, 1): 'wK',  # 1 = location of the King bK
-            self.convert_location_to_letters(board, 2): 'wQ',  # 2 = location of the Queen wQ
-            self.convert_location_to_letters(board, 3): 'bK',  # 3 = location fo the Enemy King wK
-        }
-        return board_location
-
-    @staticmethod
-    def convert_location_to_letters(board, figure_id):
-        match = np.where(board == figure_id)
-        return f"{chr(97 + match[0][0])}{match[1][0] + 1}"
 
 
 class SARSA_NN(NeuralNet):
@@ -224,5 +204,3 @@ class QLEARNING_NN(NeuralNet):
 
     def _call_epsilongreedy(self, param, a_next, epsilon_f):
         return epsilongreedy_policy(param, a_next, 0)
-
-
