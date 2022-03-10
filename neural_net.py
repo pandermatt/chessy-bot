@@ -1,21 +1,8 @@
 # Import
-import pickle
 import math
 import random
-
-import numpy.matlib
-
-from Adam import Adam
-from chess_env import ChessEnv
-from degree_freedom import degree_freedom_king1
-from degree_freedom import degree_freedom_king2
-from degree_freedom import degree_freedom_queen
+from adam import Adam
 from generate_game import *
-
-# input_layer_size = 10
-# first_hidden_layer_size = 15
-# output_layer_size = x
-# input: layer_sizes = [input_layer_size, first_hidden_layer_size, ..., output_layer_size]
 
 
 def epsilongreedy_policy(Qvalues, a, epsilon):
@@ -144,7 +131,7 @@ class NeuralNet:
             if n % intern_output_nr == 0 and n > 0:
                 print(f"Epoche ({n}/{N_episodes})")
                 
-                print('Chessy Agent, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
+                print(f'{self._name}, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
                       'Number of steps: ', np.mean(N_moves_save[(n - intern_output_nr):n]))
 
             while Done == 0:
@@ -204,8 +191,22 @@ class NeuralNet:
               f"Checkmates: {np.count_nonzero(checkmate_save > 0)}")
         return self._name, avg_reward, avg_moves
 
+    def calculate_location(self, S):
+        board = np.array(S)
+        board_location = {
+            self.convert_location_to_letters(board, 1): 'wK',  # 1 = location of the King bK
+            self.convert_location_to_letters(board, 2): 'wQ',  # 2 = location of the Queen wQ
+            self.convert_location_to_letters(board, 3): 'bK',  # 3 = location fo the Enemy King wK
+        }
+        return board_location
 
-class SARSA_NN(Neural_net):
+    @staticmethod
+    def convert_location_to_letters(board, figure_id):
+        match = np.where(board == figure_id)
+        return f"{chr(97 + match[0][0])}{match[1][0] + 1}"
+
+
+class SARSA_NN(NeuralNet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -215,7 +216,7 @@ class SARSA_NN(Neural_net):
         return epsilongreedy_policy(param, a_next, epsilon_f)
 
 
-class QLEARNING_NN(Neural_net):
+class QLEARNING_NN(NeuralNet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -224,16 +225,4 @@ class QLEARNING_NN(Neural_net):
     def _call_epsilongreedy(self, param, a_next, epsilon_f):
         return epsilongreedy_policy(param, a_next, 0)
 
-def calculate_location(self, S):
-    board = np.array(S)
-    board_location = {
-        self.convert_location_to_letters(board, 1): 'wK',  # 1 = location of the King bK
-        self.convert_location_to_letters(board, 2): 'wQ',  # 2 = location of the Queen wQ
-        self.convert_location_to_letters(board, 3): 'bK',  # 3 = location fo the Enemy King wK
-    }
-    return board_location
 
-@staticmethod
-def convert_location_to_letters(board, figure_id):
-    match = np.where(board == figure_id)
-    return f"{chr(97 + match[0][0])}{match[1][0] + 1}"

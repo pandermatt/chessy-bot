@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 
 from chess_env import *
-from Neural_net import QLEARNING_NN
-from Neural_net import SARSA_NN
+from neural_net import QLEARNING_NN
+from neural_net import SARSA_NN
 from chessy_agent import ChessyAgent
 
 size_board = 4
