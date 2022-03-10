@@ -112,9 +112,6 @@ class NeuralNet:
         return epsilongreedy_policy(param, a_next, epsilon_f)
 
     def train(self, N_episodes, callback):
-        if is_model_present(self._name):
-            self = load_file(self._name)
-
         R_save = np.zeros([N_episodes, 1])
         avg_reward = np.zeros(N_episodes)
         checkmate_save = np.zeros(N_episodes)
@@ -144,8 +141,7 @@ class NeuralNet:
                 x = self._forward_pass(X)
                 a_agent, qvalue = epsilongreedy_policy(x[-1], a, epsilon_f)
 
-                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(
-                    a_agent)
+                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
 
                 # THE EPISODE HAS ENDED, UPDATE... BE CAREFUL, THIS IS THE LAST STEP OF THE EPISODE
                 if Done == 1:

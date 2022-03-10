@@ -2,6 +2,7 @@ import numpy as np
 
 from agents.agent import Agent
 from neural_net import SARSA_NN, QLEARNING_NN
+from util.storage_io import is_model_present, load_file
 
 
 class ChessyAgent(Agent):
@@ -30,6 +31,8 @@ class SarsaChessyAgent(ChessyAgent):
 
     def run(self, callback=lambda *args: None):
         nn = SARSA_NN(self.env, self._get_layer_sizes(), xavier=True)
+        if is_model_present(nn._name):
+            nn = load_file(nn._name)
         return nn.train(self.N_episodes, callback)
 
 
@@ -38,4 +41,6 @@ class QLearningChessyAgent(ChessyAgent):
 
     def run(self, callback=lambda *args: None):
         nn = QLEARNING_NN(self.env, self._get_layer_sizes(), xavier=True)
+        if is_model_present(nn._name):
+            nn = load_file(nn._name)
         return nn.train(self.N_episodes, callback)
