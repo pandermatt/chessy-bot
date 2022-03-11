@@ -1,45 +1,9 @@
 # Import
 import random
 
-from adam import Adam
 from generate_game import *
-from util.storage_io import dump_file, is_model_present, load_file
-
-
-def epsilongreedy_policy(Qvalues, a, epsilon):
-    if np.random.uniform(0, 1) < epsilon:
-        a = random.choice(a)
-    else:
-        a = a[np.argmax(Qvalues[a])]
-
-    qvalue = np.zeros(len(Qvalues))
-    qvalue[a] = Qvalues[a]
-
-    return a, qvalue
-
-
-def initialize_weights(layer_sizes, weights, biases, adam_w, adam_b, beta_adam, xavier):
-    for idx in range(len(layer_sizes) - 1):
-        if xavier:
-            weights.append(
-                np.random.randn(layer_sizes[idx + 1], layer_sizes[idx]) *
-                np.sqrt(1 / (layer_sizes[idx])))
-        else:
-            weights.append(
-                np.random.uniform(
-                    0, 1, (layer_sizes[idx + 1], layer_sizes[idx])))
-            weights[idx] = np.divide(
-                weights[idx],
-                np.tile(
-                    np.sum(weights[idx], 1)[:, None],
-                    (1, layer_sizes[idx])),
-            )
-
-        biases.append(np.zeros((layer_sizes[idx + 1])))
-
-    for idx in range(len(weights)):
-        adam_w.append(Adam(weights[idx], beta_adam))
-        adam_b.append(Adam(biases[idx], beta_adam))
+from neuronal_engine.helper import initialize_weights, epsilon_greedy_policy
+from util.storage_io import dump_file
 
 
 class NeuralNet:
@@ -63,7 +27,8 @@ class NeuralNet:
         self.adam_w = []
         self.adam_b = []
 
-        initialize_weights(self.layer_sizes, self.weights, self.biases, self.adam_w, self.adam_b, self.beta_adam, self.xavier)
+        initialize_weights(self.layer_sizes, self.weights, self.biases, self.adam_w, self.adam_b, self.beta_adam,
+                           self.xavier)
 
     def _forward_pass(self, X):
         return self._execute_forwardpass(X, self.weights, self.biases)
@@ -120,8 +85,8 @@ class NeuralNet:
     def _error_func_not_done(self, R, qvalue, qvalue_next, action_taken):
         return (R + self.gamma * qvalue_next - qvalue) * action_taken
 
-    def _call_epsilongreedy(self, param, a_next, epsilon_f):
-        return epsilongreedy_policy(param, a_next, epsilon_f)
+    def _epsilon_greedy(self, param, a_next, epsilon_f):
+        raise Exception('epsilon greedy is not implemented')
 
     def train(self, N_episodes, callback):
         R_save = np.zeros([N_episodes, 1])
@@ -151,7 +116,7 @@ class NeuralNet:
             while Done == 0:
                 a, _ = np.where(allowed_a == 1)
                 x = self._forward_pass(X)
-                a_agent, qvalue = epsilongreedy_policy(x[-1], a, epsilon_f)
+                a_agent, qvalue = self._epsilon_greedy(x[-1], a, epsilon_f)
 
                 S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
 
@@ -178,8 +143,7 @@ class NeuralNet:
                     # Compute the delta
                     a_next, _ = np.where(allowed_a_next == 1)
                     x_next = self._forward_pass(X_next)
-                    a_agent_next, qvalue_next = self._call_epsilongreedy(
-                        x_next[-1], a_next, epsilon_f)
+                    a_agent_next, qvalue_next = self._epsilon_greedy(x_next[-1], a_next, epsilon_f)
 
                     self._backprop(x, a, R, qvalue, Done, qvalue_next)
 
@@ -205,8 +169,8 @@ class SARSA_NN(NeuralNet):
         super().__init__(*args, **kwargs)
         self._name = "SARSA BOT"
 
-    def _call_epsilongreedy(self, param, a_next, epsilon_f):
-        return epsilongreedy_policy(param, a_next, epsilon_f)
+    def _epsilon_greedy(self, param, a_next, epsilon_f):
+        return epsilon_greedy_policy(param, a_next, epsilon_f)
 
 
 class QLEARNING_NN(NeuralNet):
@@ -215,8 +179,8 @@ class QLEARNING_NN(NeuralNet):
         super().__init__(*args, **kwargs)
         self._name = "QLEARNING BOT"
 
-    def _call_epsilongreedy(self, param, a_next, epsilon_f):
-        return epsilongreedy_policy(param, a_next, 0)
+    def _epsilon_greedy(self, param, a_next, epsilon_f):
+        return epsilon_greedy_policy(param, a_next, 0)
 
 
 class DOUBLE_QLEARNING_NN(NeuralNet):
@@ -232,7 +196,8 @@ class DOUBLE_QLEARNING_NN(NeuralNet):
         self.choice = 0
         self.counter = 0
 
-        initialize_weights(self.layer_sizes, self.weights2, self.biases2, self.adam_w2, self.adam_b2, self.beta_adam, self.xavier)
+        initialize_weights(self.layer_sizes, self.weights2, self.biases2, self.adam_w2, self.adam_b2, self.beta_adam,
+                           self.xavier)
 
     def _forward_pass(self, X):
         if self.counter == 0:
@@ -248,15 +213,18 @@ class DOUBLE_QLEARNING_NN(NeuralNet):
                 return self._execute_forwardpass(X, self.weights, self.biases)
             else:
                 return self._execute_forwardpass(X, self.weights2, self.biases2)
-            
+
     def _backprop(self, x, a, R, qvalue, Done, qvalue_next=0):
         if self.choice:
-            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights2, self.biases2, self.adam_w2, self.adam_b2)
+            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights2, self.biases2, self.adam_w2,
+                                   self.adam_b2)
         else:
-            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights, self.biases, self.adam_w, self.adam_b)
+            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights, self.biases, self.adam_w,
+                                   self.adam_b)
 
-    def _call_epsilongreedy(self, param, a_next, epsilon_f):
-        return epsilongreedy_policy(param, a_next, 0)
+    def _epsilon_greedy(self, param, a_next, epsilon_f):
+        return epsilon_greedy_policy(param, a_next, 0)
+
 
 class DOUBLE_SARSA_NN(DOUBLE_QLEARNING_NN):
 
@@ -264,10 +232,5 @@ class DOUBLE_SARSA_NN(DOUBLE_QLEARNING_NN):
         super().__init__(*args, **kwargs)
         self._name = "DOUBLE-SARSA BOT"
 
-    def _call_epsilongreedy(self, param, a_next, epsilon_f):
-        return epsilongreedy_policy(param, a_next, epsilon_f)
-                
-
-
-
-
+    def _epsilon_greedy(self, param, a_next, epsilon_f):
+        return epsilon_greedy_policy(param, a_next, epsilon_f)

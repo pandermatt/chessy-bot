@@ -1,7 +1,7 @@
 import numpy as np
 
 from agents.agent import Agent
-from neural_net import SARSA_NN, QLEARNING_NN, DOUBLE_QLEARNING_NN, DOUBLE_SARSA_NN
+from neuronal_engine.neural_net import SARSA_NN, QLEARNING_NN, DOUBLE_QLEARNING_NN, DOUBLE_SARSA_NN
 from util.storage_io import is_model_present, load_file
 
 
