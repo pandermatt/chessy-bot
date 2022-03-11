@@ -56,11 +56,8 @@ class NeuralNet:
                 a, _ = np.where(allowed_a == 1)
                 x = self.prop.forward_pass(X)
 
-                if type == SARSA:
-                    if a_agent_next is None and qvalue_next is None:
-                        a_agent, qvalue = self._epsilon_greedy(x[-1], a, epsilon_f)
-                    else:
-                        a_agent, qvalue = a_agent_next, qvalue_next
+                if self.type == SARSA and a_agent_next is not None and qvalue_next is not None:
+                    a_agent, qvalue = a_agent_next, qvalue_next
                 else:
                     a_agent, qvalue = self._epsilon_greedy(x[-1], a, epsilon_f)
 
