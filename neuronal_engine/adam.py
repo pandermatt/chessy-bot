@@ -4,9 +4,8 @@ import numpy as np
 class Adam:
 
     def __init__(self, Params, beta1):
-
-        N_dim = np.shape(np.shape(Params))[
-            0]  # It finds out if the parameters given are in a vector (N_dim=1) or a matrix (N_dim=2)
+        # It finds out if the parameters given are in a vector (N_dim=1) or a matrix (N_dim=2)
+        N_dim = np.shape(np.shape(Params))[0]
 
         # INITIALISATION OF THE MOMENTUMS
         if N_dim == 1:

@@ -23,7 +23,7 @@ class RandomAgent(Agent):
             done = 0
             move_counter = 1
 
-            callback(board_state, n, N_episodes, R_save_random, N_moves_save_random)
+            callback(self, board_state, n, N_episodes, R_save_random, N_moves_save_random)
             while done == 0:
                 a, _ = np.where(allowed_actions == 1)
                 current_action = np.random.permutation(a)[0]

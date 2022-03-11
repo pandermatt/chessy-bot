@@ -1,8 +1,20 @@
+import numpy as np
 from matplotlib import pyplot as plt
 
-from agents.chessy_agent import QLearningChessyAgent, SarsaChessyAgent, DoubleQLearningChessyAgent, DoubleSARSAChessyAgent
-from agents.first_five_agent import FirstFiveAgent
-from agents.random_agent import RandomAgent
+from agents.chessy_agent import QLearningChessyAgent, DoubleQLearningChessyAgent, \
+    DoubleSARSAChessyAgent
+from util.storage_io import dump_file
+
+intern_output_nr = 100
+
+
+def print_to_console(nn, _, n, N_episodes, R_save, N_moves_save):
+    if n % intern_output_nr == 0 and n > 0:
+        dump_file(nn, nn._name)
+        print(f"Epoche ({n}/{N_episodes})")
+
+        print(f'{nn._name}, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
+              'Number of steps: ', np.mean(N_moves_save[(n - intern_output_nr):n]))
 
 
 def print_stats(n_episodes, names, r_saves, step_saves):
@@ -29,14 +41,14 @@ def print_stats(n_episodes, names, r_saves, step_saves):
 if __name__ == '__main__':
     board_size = 4
 
-    #FirstFiveAgent().run()
-    #RandomAgent().run()
+    # FirstFiveAgent().run()
+    # RandomAgent().run()
 
     N_episodes = 20000  # THE NUMBER OF GAMES TO BE PLAYED
-    name1, reward1, moves1 = SarsaChessyAgent(N_episodes).run()
-    name2, reward2, moves2 = QLearningChessyAgent(N_episodes).run()
-    name3, reward3, moves3 = DoubleQLearningChessyAgent(N_episodes).run()
-    name4, reward4, moves4 = DoubleSARSAChessyAgent(N_episodes).run()
+    name1, reward1, moves1 = SarsaChessyAgent(N_episodes).run(print_to_console)
+    name2, reward2, moves2 = QLearningChessyAgent(N_episodes).run(print_to_console)
+    name3, reward3, moves3 = DoubleSARSAChessyAgent(N_episodes).run(print_to_console)
+    name4, reward4, moves4 = DoubleQLearningChessyAgent(N_episodes).run(print_to_console)
 
     names = [name1, name2, name3, name4]
     rewards = [reward1, reward2, reward3, reward4]

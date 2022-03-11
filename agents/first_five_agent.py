@@ -15,7 +15,7 @@ class FirstFiveAgent(Agent):
         print("check? ", self.env.check)
         # PRINT THE NUMBER OF LOCATIONS THAT THE ENEMY KING CAN MOVE TO
         print("dofk2 ", np.sum(self.env.dfk2_constrain).astype(int))
-        callback(S, 0, 5, [0], [0])
+        callback(self, S, 0, 5, [0], [0])
 
         for i in range(6):
             a, _ = np.where(allowed_a == 1)  # FIND WHAT THE ALLOWED ACTIONS ARE
@@ -24,7 +24,7 @@ class FirstFiveAgent(Agent):
             S, X, allowed_a, R, Done = self.env.one_step(a_agent)  # UPDATE THE ENVIRONMENT
 
             # PRINT CHESS BOARD AND VARIABLES
-            callback(S, i, 5, [R], [0])
+            callback(self, S, i, 5, [R], [0])
 
             print("")
             print(S)

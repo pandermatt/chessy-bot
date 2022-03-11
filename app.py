@@ -32,16 +32,17 @@ def before_first_request():
 
 def update_load():
     with app.app_context():
-        def update_web(S, n, N_episodes, R_save, N_moves_save):
-            global app_content
-            app_content = {'board': calculate_location(S),
-                           'epoche_string': f"{n}/{N_episodes}",
-                           'average_reward': np.mean(R_save[(n - 100):n]),
-                           'num_of_steps': np.mean(N_moves_save[(n - 100):n]),
-                           'percentage': f"{n / N_episodes * 100}%",
-                           'percentage_label': f"{math.ceil(n / N_episodes * 100)}%"
-                           }
-            turbo.push(turbo.replace(render_template('chess_board.html'), 'load'))
+        def update_web(_, S, n, N_episodes, R_save, N_moves_save):
+            if n % 10 == 0:
+                global app_content
+                app_content = {'board': calculate_location(S),
+                               'epoche_string': f"{n}/{N_episodes}",
+                               'average_reward': np.mean(R_save[(n - 100):n]),
+                               'num_of_steps': np.mean(N_moves_save[(n - 100):n]),
+                               'percentage': f"{n / N_episodes * 100}%",
+                               'percentage_label': f"{math.ceil(n / N_episodes * 100)}%"
+                               }
+                turbo.push(turbo.replace(render_template('chess_board.html'), 'load'))
 
         FirstFiveAgent().run(update_web)
         RandomAgent().run(update_web)

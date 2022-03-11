@@ -1,7 +1,7 @@
 import numpy as np
 
 from agents.agent import Agent
-from neuronal_engine.neural_net import SARSA_NN, QLEARNING_NN, DOUBLE_QLEARNING_NN, DOUBLE_SARSA_NN
+from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, DoubleSarsaNn
 from util.storage_io import is_model_present, load_file
 
 
@@ -31,9 +31,7 @@ class SarsaChessyAgent(ChessyAgent):
     NAME = "SARSA ChessyAgent"
 
     def run(self, callback=lambda *args: None):
-        nn = SARSA_NN(self.env, self._get_layer_sizes(), xavier=True)
-        if is_model_present(nn._name):
-            nn = load_file(nn._name)
+        nn = SarsaNn(self.env, self._get_layer_sizes(), xavier=True)
         return nn.train(self.N_episodes, callback)
 
 
@@ -41,9 +39,7 @@ class QLearningChessyAgent(ChessyAgent):
     NAME = "Q-learning ChessyAgent"
 
     def run(self, callback=lambda *args: None):
-        nn = QLEARNING_NN(self.env, self._get_layer_sizes(), xavier=True)
-        if is_model_present(nn._name):
-            nn = load_file(nn._name)
+        nn = QlearningNn(self.env, self._get_layer_sizes(), xavier=True)
         return nn.train(self.N_episodes, callback)
 
 
@@ -51,9 +47,7 @@ class DoubleQLearningChessyAgent(ChessyAgent):
     NAME = "Double-Q-learning ChessyAgent"
 
     def run(self, callback=lambda *args: None):
-        nn = DOUBLE_QLEARNING_NN(self.env, self._get_layer_sizes(), xavier=True)
-        if is_model_present(nn._name):
-            nn = load_file(nn._name)
+        nn = DoubleQlearningNn(self.env, self._get_layer_sizes(), xavier=True)
         return nn.train(self.N_episodes, callback)
 
 
@@ -61,7 +55,5 @@ class DoubleSARSAChessyAgent(ChessyAgent):
     NAME = "Double-SARSA-learning ChessyAgent"
 
     def run(self, callback=lambda *args: None):
-        nn = DOUBLE_SARSA_NN(self.env, self._get_layer_sizes(), xavier=True)
-        if is_model_present(nn._name):
-            nn = load_file(nn._name)
+        nn = DoubleSarsaNn(self.env, self._get_layer_sizes(), xavier=True)
         return nn.train(self.N_episodes, callback)

@@ -1,9 +1,11 @@
 # Import
-import random
 
 from generate_game import *
 from neuronal_engine.helper import initialize_weights, epsilon_greedy_policy
-from util.storage_io import dump_file
+from neuronal_engine.propagation_handler import PropagationHandler, DoublePropagationHandler
+
+SARSA = 'sarsa'
+QLEARNING = 'q-learning'
 
 
 class NeuralNet:
@@ -27,63 +29,10 @@ class NeuralNet:
         self.adam_w = []
         self.adam_b = []
 
+        self.prop = PropagationHandler(self)
+
         initialize_weights(self.layer_sizes, self.weights, self.biases, self.adam_w, self.adam_b, self.beta_adam,
                            self.xavier)
-
-    def _forward_pass(self, X):
-        return self._execute_forwardpass(X, self.weights, self.biases)
-
-    def _execute_forwardpass(self, X, weights, biases):
-        x = [X]
-        h = []
-        for idx in range(len(weights)):
-            h.append(np.dot(weights[idx], x[-1]) + biases[idx])
-            x.append(1 / (1 + np.exp(-h[-1])))
-
-        return x
-
-    def _backprop(self, x, a, R, qvalue, Done, qvalue_next=0):
-        self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights, self.biases, self.adam_w, self.adam_b)
-
-    def _execute_backprop(self, x, a, R, qvalue, Done, qvalue_next, weights, biases, adam_w, adam_b):
-        dweights = []
-        dbiases = []
-
-        action_taken = np.zeros(len(x[-1]))
-        action_taken[a] = 1
-
-        x[-1] = action_taken * qvalue
-
-        for idx in range(len(weights)):
-            dweights.append(np.zeros(weights[idx].shape))
-            dbiases.append(np.zeros(biases[idx].shape))
-
-        for idx in range(len(weights)):
-            if idx == 0:
-                if Done == 1:
-                    e_n = self._error_func_done(R, qvalue, action_taken)
-                else:
-                    e_n = self._error_func_not_done(R, qvalue, qvalue_next,
-                                                    action_taken)
-                delta = x[-1] * (1 - x[-1]) * e_n
-            else:
-                delta = (x[-(idx + 1)] * (1 - x[-(idx + 1)]) *
-                         np.dot(np.transpose(weights[-idx]), delta))
-            dweights[-(idx + 1)] += np.outer(delta, x[-(idx + 2)])
-            dbiases[-(idx + 1)] += delta
-
-        for idx in range(len(weights)):
-            weights[idx] += (self.eta *
-                             adam_w[idx].Compute(dweights[idx]) *
-                             x[idx])
-            biases[idx] += self.eta * adam_b[idx].Compute(
-                dbiases[idx])
-
-    def _error_func_done(self, R, qvalue, action_taken):
-        return (R - qvalue) * action_taken
-
-    def _error_func_not_done(self, R, qvalue, qvalue_next, action_taken):
-        return (R + self.gamma * qvalue_next - qvalue) * action_taken
 
     def _epsilon_greedy(self, param, a_next, epsilon_f):
         raise Exception('epsilon greedy is not implemented')
@@ -95,34 +44,29 @@ class NeuralNet:
         N_moves_save = np.zeros([N_episodes, 1])
         avg_moves = np.zeros(N_episodes)
 
-        intern_output_nr = 1000
-        web_output_nr = 10
-
         for n in range(N_episodes):
-            epsilon_f = self.epsilon_0 / (1 + self.beta * n
-                                          )  # DECAYING EPSILON
-            Done = 0  # SET DONE TO ZERO (BEGINNING OF THE EPISODE)
-            move_counter = 1  # COUNTER FOR NUMBER OF ACTIONS
+            epsilon_f = self.epsilon_0 / (1 + self.beta * n)  # DECAYING EPSILON
+            move_counter = 1
 
             S, X, allowed_a = self.env.initialise_game()
 
-            if n % intern_output_nr == 0 and n > 0:
-                dump_file(self, self._name)
-                print(f"Epoche ({n}/{N_episodes})")
+            a_agent_next, qvalue_next = None, None
 
-                print(f'{self._name}, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
-                      'Number of steps: ', np.mean(N_moves_save[(n - intern_output_nr):n]))
-
-            while Done == 0:
+            while True:
                 a, _ = np.where(allowed_a == 1)
-                x = self._forward_pass(X)
-                a_agent, qvalue = self._epsilon_greedy(x[-1], a, epsilon_f)
+                x = self.prop.forward_pass(X)
+
+                if type == SARSA:
+                    if a_agent_next is None and qvalue_next is None:
+                        a_agent, qvalue = self._epsilon_greedy(x[-1], a, epsilon_f)
+                    else:
+                        a_agent, qvalue = a_agent_next, qvalue_next
+                else:
+                    a_agent, qvalue = self._epsilon_greedy(x[-1], a, epsilon_f)
 
                 S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
 
-                # THE EPISODE HAS ENDED, UPDATE... BE CAREFUL, THIS IS THE LAST STEP OF THE EPISODE
                 if Done == 1:
-
                     R_save[n] = np.copy(R)
                     N_moves_save[n] = np.copy(move_counter)
                     checkmate_save[n] = np.copy(R)
@@ -134,28 +78,23 @@ class NeuralNet:
                         avg_reward[n] = R_save[n]
                         avg_moves[n] = N_moves_save[n]
 
-                    self._backprop(x, a, R, qvalue, Done)
+                    self.prop.backprop(x, a, R, qvalue, Done)
 
                     break
-
-                # IF THE EPISODE IS NOT OVER...
                 else:
-                    # Compute the delta
                     a_next, _ = np.where(allowed_a_next == 1)
-                    x_next = self._forward_pass(X_next)
+                    x_next = self.prop.forward_pass(X_next)
                     a_agent_next, qvalue_next = self._epsilon_greedy(x_next[-1], a_next, epsilon_f)
 
-                    self._backprop(x, a, R, qvalue, Done, qvalue_next)
+                    self.prop.backprop(x, a, R, qvalue, Done, qvalue_next)
 
-                # NEXT STATE AND CO. BECOME ACTUAL STATE...
                 S = np.copy(S_next)
                 X = np.copy(X_next)
                 allowed_a = np.copy(allowed_a_next)
 
-                move_counter += 1  # UPDATE COUNTER FOR NUMBER OF ACTIONS
+                move_counter += 1
 
-            if n % web_output_nr == 0:
-                callback(S, n, N_episodes, R_save, N_moves_save)
+            callback(self, S, n, N_episodes, R_save, N_moves_save)
 
         print(f"{self._name}, Average reward: {np.mean(R_save)}\n"
               f"Number of steps: {np.mean(N_moves_save)}\n"
@@ -163,7 +102,8 @@ class NeuralNet:
         return self._name, avg_reward, avg_moves
 
 
-class SARSA_NN(NeuralNet):
+class SarsaNn(NeuralNet):
+    type = SARSA
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -173,7 +113,8 @@ class SARSA_NN(NeuralNet):
         return epsilon_greedy_policy(param, a_next, epsilon_f)
 
 
-class QLEARNING_NN(NeuralNet):
+class QlearningNn(NeuralNet):
+    type = QLEARNING
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -183,7 +124,8 @@ class QLEARNING_NN(NeuralNet):
         return epsilon_greedy_policy(param, a_next, 0)
 
 
-class DOUBLE_QLEARNING_NN(NeuralNet):
+class DoubleQlearningNn(NeuralNet):
+    type = QLEARNING
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -196,37 +138,17 @@ class DOUBLE_QLEARNING_NN(NeuralNet):
         self.choice = 0
         self.counter = 0
 
+        self.prop = DoublePropagationHandler(self)
+
         initialize_weights(self.layer_sizes, self.weights2, self.biases2, self.adam_w2, self.adam_b2, self.beta_adam,
                            self.xavier)
-
-    def _forward_pass(self, X):
-        if self.counter == 0:
-            self.counter += 1
-            self.choice = random.randint(0, 1)
-            if self.choice:
-                return self._execute_forwardpass(X, self.weights2, self.biases2)
-            else:
-                return self._execute_forwardpass(X, self.weights, self.biases)
-        else:
-            self.counter = 0
-            if self.choice:
-                return self._execute_forwardpass(X, self.weights, self.biases)
-            else:
-                return self._execute_forwardpass(X, self.weights2, self.biases2)
-
-    def _backprop(self, x, a, R, qvalue, Done, qvalue_next=0):
-        if self.choice:
-            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights2, self.biases2, self.adam_w2,
-                                   self.adam_b2)
-        else:
-            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights, self.biases, self.adam_w,
-                                   self.adam_b)
 
     def _epsilon_greedy(self, param, a_next, epsilon_f):
         return epsilon_greedy_policy(param, a_next, 0)
 
 
-class DOUBLE_SARSA_NN(DOUBLE_QLEARNING_NN):
+class DoubleSarsaNn(DoubleQlearningNn):
+    type = SARSA
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
