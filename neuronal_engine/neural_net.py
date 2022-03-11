@@ -59,7 +59,8 @@ class NeuralNet:
                 if self.type == SARSA and a_agent_next is not None and qvalue_next is not None:
                     a_agent, qvalue = a_agent_next, qvalue_next
                 else:
-                    a_agent, qvalue = self._epsilon_greedy(x[-1], a, epsilon_f)
+                    # TODO: a_agent, qvalue = self._epsilon_greedy(x[-1], a, epsilon_f)
+                    a_agent, qvalue = epsilon_greedy_policy(x[-1], a, epsilon_f)
 
                 S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
 
