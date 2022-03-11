@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from agents.chessy_agent import QLearningChessyAgent, DoubleQLearningChessyAgent, \
-    DoubleSARSAChessyAgent
+    DoubleSARSAChessyAgent, SarsaChessyAgent
 from util.storage_io import dump_file
 
 intern_output_nr = 100
