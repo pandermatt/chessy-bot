@@ -18,10 +18,36 @@ def epsilongreedy_policy(Qvalues, a, epsilon):
     return a, qvalue
 
 
+def initialize_weights(layer_sizes, weights, biases, adam_w, adam_b, beta_adam, xavier):
+    for idx in range(len(layer_sizes) - 1):
+        if xavier:
+            weights.append(
+                np.random.randn(layer_sizes[idx + 1], layer_sizes[idx]) *
+                np.sqrt(1 / (layer_sizes[idx])))
+        else:
+            weights.append(
+                np.random.uniform(
+                    0, 1, (layer_sizes[idx + 1], layer_sizes[idx])))
+            weights[idx] = np.divide(
+                weights[idx],
+                np.tile(
+                    np.sum(weights[idx], 1)[:, None],
+                    (1, layer_sizes[idx])),
+            )
+
+        biases.append(np.zeros((layer_sizes[idx + 1])))
+
+    for idx in range(len(weights)):
+        adam_w.append(Adam(weights[idx], beta_adam))
+        adam_b.append(Adam(biases[idx], beta_adam))
+
+
 class NeuralNet:
     def __init__(self, env, layer_sizes, xavier=False):
         self._name = "chessy bot"
         self.env = env
+        self.layer_sizes = layer_sizes
+        self.xavier = xavier
         self.epsilon_0 = 0.25  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
         # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
         self.beta = 0.00005
@@ -33,42 +59,28 @@ class NeuralNet:
         self.weights = []
         self.biases = []
 
-        for idx in range(len(layer_sizes) - 1):
-            if xavier:
-                self.weights.append(
-                    np.random.randn(layer_sizes[idx + 1], layer_sizes[idx]) *
-                    np.sqrt(1 / (layer_sizes[idx])))
-            else:
-                self.weights.append(
-                    np.random.uniform(
-                        0, 1, (layer_sizes[idx + 1], layer_sizes[idx])))
-                self.weights[idx] = np.divide(
-                    self.weights[idx],
-                    np.tile(
-                        np.sum(self.weights[idx], 1)[:, None],
-                        (1, layer_sizes[idx])),
-                )
-
-            self.biases.append(np.zeros((layer_sizes[idx + 1])))
-
         # initialize Adam
         self.adam_w = []
         self.adam_b = []
 
-        for idx in range(len(self.weights)):
-            self.adam_w.append(Adam(self.weights[idx], self.beta_adam))
-            self.adam_b.append(Adam(self.biases[idx], self.beta_adam))
+        initialize_weights(self.layer_sizes, self.weights, self.biases, self.adam_w, self.adam_b, self.beta_adam, self.xavier)
 
     def _forward_pass(self, X):
+        return self._execute_forwardpass(X, self.weights, self.biases)
+
+    def _execute_forwardpass(self, X, weights, biases):
         x = [X]
         h = []
-        for idx in range(len(self.weights)):
-            h.append(np.dot(self.weights[idx], x[-1]) + self.biases[idx])
+        for idx in range(len(weights)):
+            h.append(np.dot(weights[idx], x[-1]) + biases[idx])
             x.append(1 / (1 + np.exp(-h[-1])))
 
         return x
 
     def _backprop(self, x, a, R, qvalue, Done, qvalue_next=0):
+        self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights, self.biases, self.adam_w, self.adam_b)
+
+    def _execute_backprop(self, x, a, R, qvalue, Done, qvalue_next, weights, biases, adam_w, adam_b):
         dweights = []
         dbiases = []
 
@@ -77,11 +89,11 @@ class NeuralNet:
 
         x[-1] = action_taken * qvalue
 
-        for idx in range(len(self.weights)):
-            dweights.append(np.zeros(self.weights[idx].shape))
-            dbiases.append(np.zeros(self.biases[idx].shape))
+        for idx in range(len(weights)):
+            dweights.append(np.zeros(weights[idx].shape))
+            dbiases.append(np.zeros(biases[idx].shape))
 
-        for idx in range(len(self.weights)):
+        for idx in range(len(weights)):
             if idx == 0:
                 if Done == 1:
                     e_n = self._error_func_done(R, qvalue, action_taken)
@@ -91,15 +103,15 @@ class NeuralNet:
                 delta = x[-1] * (1 - x[-1]) * e_n
             else:
                 delta = (x[-(idx + 1)] * (1 - x[-(idx + 1)]) *
-                         np.dot(np.transpose(self.weights[-idx]), delta))
+                         np.dot(np.transpose(weights[-idx]), delta))
             dweights[-(idx + 1)] += np.outer(delta, x[-(idx + 2)])
             dbiases[-(idx + 1)] += delta
 
-        for idx in range(len(self.weights)):
-            self.weights[idx] += (self.eta *
-                                  self.adam_w[idx].Compute(dweights[idx]) *
-                                  x[idx])
-            self.biases[idx] += self.eta * self.adam_b[idx].Compute(
+        for idx in range(len(weights)):
+            weights[idx] += (self.eta *
+                             adam_w[idx].Compute(dweights[idx]) *
+                             x[idx])
+            biases[idx] += self.eta * adam_b[idx].Compute(
                 dbiases[idx])
 
     def _error_func_done(self, R, qvalue, action_taken):
@@ -205,3 +217,57 @@ class QLEARNING_NN(NeuralNet):
 
     def _call_epsilongreedy(self, param, a_next, epsilon_f):
         return epsilongreedy_policy(param, a_next, 0)
+
+
+class DOUBLE_QLEARNING_NN(NeuralNet):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._name = "DOUBLE-QLEARNING BOT"
+        self.weights2 = []
+        self.biases2 = []
+        self.adam_w2 = []
+        self.adam_b2 = []
+
+        self.choice = 0
+        self.counter = 0
+
+        initialize_weights(self.layer_sizes, self.weights2, self.biases2, self.adam_w2, self.adam_b2, self.beta_adam, self.xavier)
+
+    def _forward_pass(self, X):
+        if self.counter == 0:
+            self.counter += 1
+            self.choice = random.randint(0, 1)
+            if self.choice:
+                return self._execute_forwardpass(X, self.weights2, self.biases2)
+            else:
+                return self._execute_forwardpass(X, self.weights, self.biases)
+        else:
+            self.counter = 0
+            if self.choice:
+                return self._execute_forwardpass(X, self.weights, self.biases)
+            else:
+                return self._execute_forwardpass(X, self.weights2, self.biases2)
+            
+    def _backprop(self, x, a, R, qvalue, Done, qvalue_next=0):
+        if self.choice:
+            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights2, self.biases2, self.adam_w2, self.adam_b2)
+        else:
+            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.weights, self.biases, self.adam_w, self.adam_b)
+
+    def _call_epsilongreedy(self, param, a_next, epsilon_f):
+        return epsilongreedy_policy(param, a_next, 0)
+
+class DOUBLE_SARSA_NN(DOUBLE_QLEARNING_NN):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._name = "DOUBLE-SARSA BOT"
+
+    def _call_epsilongreedy(self, param, a_next, epsilon_f):
+        return epsilongreedy_policy(param, a_next, epsilon_f)
+                
+
+
+
+

@@ -47,5 +47,5 @@ class RandomAgent(Agent):
             "Number of steps: ",
             np.mean(N_moves_save_random),
             "Number of checkmates: ",
-            np.count_nonzero(checkmate_save == 1),
+            np.count_nonzero(checkmate_save > 0)
         )

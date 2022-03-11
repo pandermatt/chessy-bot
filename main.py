@@ -1,23 +1,25 @@
 from matplotlib import pyplot as plt
 
-from agents.chessy_agent import QLearningChessyAgent, SarsaChessyAgent
+from agents.chessy_agent import QLearningChessyAgent, SarsaChessyAgent, DoubleQLearningChessyAgent, DoubleSARSAChessyAgent
 from agents.first_five_agent import FirstFiveAgent
 from agents.random_agent import RandomAgent
 
 
-def print_stats(n_episodes, name1, r_save1, step_save1, name2, r_save2, step_save2):
+def print_stats(n_episodes, names, r_saves, step_saves):
     episodes = range(n_episodes)
     plt.subplots_adjust(wspace=1, hspace=0.3)
 
+    count = len(names)
+
     plt.subplot(2, 1, 1)
-    plt.plot(episodes, r_save1, label=name1)
-    plt.plot(episodes, r_save2, label=name2)
+    for idx in range(count):
+        plt.plot(episodes, r_saves[idx], label=names[idx])
     plt.title(f"Avg. Rewards")
     plt.legend()
 
     plt.subplot(2, 1, 2)
-    plt.plot(episodes, step_save1, label=name1)
-    plt.plot(episodes, step_save2, label=name2)
+    for idx in range(count):
+        plt.plot(episodes, step_saves[idx], label=names[idx])
     plt.title(f"Avg. Steps ")
     plt.legend()
 
@@ -27,10 +29,16 @@ def print_stats(n_episodes, name1, r_save1, step_save1, name2, r_save2, step_sav
 if __name__ == '__main__':
     board_size = 4
 
-    FirstFiveAgent().run()
-    RandomAgent().run()
+    #FirstFiveAgent().run()
+    #RandomAgent().run()
 
-    N_episodes = 1000  # THE NUMBER OF GAMES TO BE PLAYED
+    N_episodes = 20000  # THE NUMBER OF GAMES TO BE PLAYED
     name1, reward1, moves1 = SarsaChessyAgent(N_episodes).run()
     name2, reward2, moves2 = QLearningChessyAgent(N_episodes).run()
-    print_stats(N_episodes, name1, reward1, moves1, name2, reward2, moves2)
+    name3, reward3, moves3 = DoubleQLearningChessyAgent(N_episodes).run()
+    name4, reward4, moves4 = DoubleSARSAChessyAgent(N_episodes).run()
+
+    names = [name1, name2, name3, name4]
+    rewards = [reward1, reward2, reward3, reward4]
+    moves = [moves1, moves2, moves3, moves4]
+    print_stats(N_episodes, names, rewards, moves)
