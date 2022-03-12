@@ -3,18 +3,18 @@ from matplotlib import pyplot as plt
 
 from agents.chessy_agent import QLearningChessyAgent, DoubleQLearningChessyAgent, \
     DoubleSARSAChessyAgent, SarsaChessyAgent
+from util.logger import log
 from util.storage_io import dump_file
 
-intern_output_nr = 100
+intern_output_nr = 500
 
 
 def print_to_console(nn, _, n, N_episodes, R_save, N_moves_save):
     if n % intern_output_nr == 0 and n > 0:
         dump_file(nn, nn._name)
-        print(f"Epoche ({n}/{N_episodes})")
-
-        print(f'{nn._name}, Average reward:', np.mean(R_save[(n - intern_output_nr):n]),
-              'Number of steps: ', np.mean(N_moves_save[(n - intern_output_nr):n]))
+        log.info(f"Epoche ({n}/{N_episodes})")
+        log.info(f"{nn._name}, Average reward: {np.mean(R_save[(n - intern_output_nr):n])} "
+                 + f"Number of steps: {np.mean(N_moves_save[(n - intern_output_nr):n])}")
 
 
 def print_stats(n_episodes, names, r_saves, step_saves):

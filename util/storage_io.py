@@ -3,6 +3,7 @@ import os
 import dill as dill
 
 from config import config
+from util.logger import log
 
 
 def get_filename(prefix: str):
@@ -16,7 +17,7 @@ def is_model_present(prefix):
 def load_file(prefix):
     filename = get_filename(prefix)
     if not os.path.isfile(filename):
-        print(f"File '{filename}' does not exist")
+        log.info(f"File '{filename}' does not exist")
         return None
     with open(filename, "rb") as f:
         return dill.load(f)

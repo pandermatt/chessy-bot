@@ -1,11 +1,13 @@
 import os
 from os.path import dirname, abspath, join, exists
 
+from util.logger import log
+
 
 def get_or_create(dir_path):
     if not exists(dir_path):
         os.makedirs(dir_path)
-        print("Creating: " + dir_path)
+        log.info("Creating: " + dir_path)
     return dir_path
 
 

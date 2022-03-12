@@ -3,9 +3,11 @@
 from generate_game import *
 from neuronal_engine.helper import initialize_weights, epsilon_greedy_policy
 from neuronal_engine.propagation_handler import PropagationHandler, DoublePropagationHandler
+from util.logger import log
 
 SARSA = 'sarsa'
 QLEARNING = 'q-learning'
+MAX_STEPS_ALLOWED = 150
 
 
 class NeuralNet:
@@ -34,9 +36,6 @@ class NeuralNet:
         initialize_weights(self.layer_sizes, self.weights, self.biases, self.adam_w, self.adam_b, self.beta_adam,
                            self.xavier)
 
-    def _epsilon_greedy(self, param, a_next, epsilon_f):
-        raise Exception('epsilon greedy is not implemented')
-
     def train(self, N_episodes, callback):
         R_save = np.zeros([N_episodes, 1])
         avg_reward = np.zeros(N_episodes)
@@ -52,14 +51,13 @@ class NeuralNet:
 
             a_agent_next, qvalue_next = None, None
 
-            while True:
+            for _ in range(MAX_STEPS_ALLOWED):
                 a, _ = np.where(allowed_a == 1)
                 x = self.prop.forward_pass(X)
 
                 if self.type == SARSA and a_agent_next is not None and qvalue_next is not None:
                     a_agent, qvalue = a_agent_next, qvalue_next
                 else:
-                    # TODO: a_agent, qvalue = self._epsilon_greedy(x[-1], a, epsilon_f)
                     a_agent, qvalue = epsilon_greedy_policy(x[-1], a, epsilon_f)
 
                 S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
@@ -82,8 +80,9 @@ class NeuralNet:
                 else:
                     a_next, _ = np.where(allowed_a_next == 1)
                     x_next = self.prop.forward_pass(X_next)
-                    a_agent_next, qvalue_next = self._epsilon_greedy(x_next[-1], a_next, epsilon_f)
-
+                    a_agent_next, qvalue_next = epsilon_greedy_policy(
+                        x_next[-1], a_next,
+                        epsilon_f if self.type == SARSA else 0)
                     self.prop.backprop(x, a, R, qvalue, Done, qvalue_next)
 
                 S = np.copy(S_next)
@@ -91,12 +90,14 @@ class NeuralNet:
                 allowed_a = np.copy(allowed_a_next)
 
                 move_counter += 1
+            else:
+                log.error(f"Epoche was longer than {MAX_STEPS_ALLOWED}")
 
             callback(self, S, n, N_episodes, R_save, N_moves_save)
 
-        print(f"{self._name}, Average reward: {np.mean(R_save)}\n"
-              f"Number of steps: {np.mean(N_moves_save)}\n"
-              f"Checkmates: {np.count_nonzero(checkmate_save > 0)}")
+        log.info(f"{self._name}, Average reward: {np.mean(R_save)}")
+        log.info(f"Number of steps: {np.mean(N_moves_save)}")
+        log.info(f"Checkmates: {np.count_nonzero(checkmate_save > 0)}")
         return self._name, avg_reward, avg_moves
 
 
@@ -107,9 +108,6 @@ class SarsaNn(NeuralNet):
         super().__init__(*args, **kwargs)
         self._name = "SARSA BOT"
 
-    def _epsilon_greedy(self, param, a_next, epsilon_f):
-        return epsilon_greedy_policy(param, a_next, epsilon_f)
-
 
 class QlearningNn(NeuralNet):
     type = QLEARNING
@@ -117,9 +115,6 @@ class QlearningNn(NeuralNet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._name = "QLEARNING BOT"
-
-    def _epsilon_greedy(self, param, a_next, epsilon_f):
-        return epsilon_greedy_policy(param, a_next, 0)
 
 
 class DoubleQlearningNn(NeuralNet):
@@ -141,9 +136,6 @@ class DoubleQlearningNn(NeuralNet):
         initialize_weights(self.layer_sizes, self.weights2, self.biases2, self.adam_w2, self.adam_b2, self.beta_adam,
                            self.xavier)
 
-    def _epsilon_greedy(self, param, a_next, epsilon_f):
-        return epsilon_greedy_policy(param, a_next, 0)
-
 
 class DoubleSarsaNn(DoubleQlearningNn):
     type = SARSA
@@ -151,6 +143,3 @@ class DoubleSarsaNn(DoubleQlearningNn):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._name = "DOUBLE-SARSA BOT"
-
-    def _epsilon_greedy(self, param, a_next, epsilon_f):
-        return epsilon_greedy_policy(param, a_next, epsilon_f)
