@@ -15,7 +15,7 @@
 </div>
 
 <p class="text-muted mx-auto" style="max-width: 400px; font-style: italic">
-    Click on the board to refresh it. Due to performance reason, it will only refresh every 2 seconds
+    Click on the board to refresh it. Due to performance reason, it will only refresh every second
 </p>
 
 <script>
@@ -29,7 +29,7 @@
     setInterval(function () {
         var position = document.getElementById("json_board").innerText;
         board.position(JSON.parse(position));
-    }, 2000);
+    }, 1000);
 </script>
 
 <style>
