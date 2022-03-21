@@ -11,6 +11,11 @@ from util.storage_io import dump_file
 intern_output_nr = 500
 
 
+def savefig(filename):
+    plt.tight_layout()
+    plt.savefig(config.model_data_file(filename), transparent="True", pad_inches=0)
+
+
 def print_to_console(nn, _, n, N_episodes, R_save, N_moves_save):
     if n % intern_output_nr == 0 and n > 0:
         dump_file(nn, nn._name)
@@ -21,10 +26,17 @@ def print_to_console(nn, _, n, N_episodes, R_save, N_moves_save):
 
 def plot_curve(episodes, names, value):
     for idx in range(len(names)):
-        plt.plot([i + 1 for i in range(100, len(value[idx]))], generate_moving_avg(value[idx]),
-                 label=f"{names[idx]} - avg last 100")
         plt.plot(episodes, value[idx], label=names[idx])
     plt.legend()
+    plt.grid(True)
+
+
+def plot_curve_avg(episodes, names, value):
+    for idx in range(len(names)):
+        plt.plot([i + 1 for i in range(100, len(value[idx]))], generate_moving_avg(value[idx]),
+                 label=f"{names[idx]}")
+    plt.legend()
+    plt.grid(True)
 
 
 def print_stats(n_episodes, names, r_saves, step_saves):
@@ -37,9 +49,18 @@ def print_stats(n_episodes, names, r_saves, step_saves):
 
     plt.subplot(2, 1, 2)
     plot_curve(episodes, names, step_saves)
-    plt.title(f"Avg. Steps ")
+    plt.title(f"Avg. Steps")
+    savefig(f"all-learning_curve.png")
 
-    plt.show()
+    plt.figure()
+    plt.subplot(2, 1, 1)
+    plot_curve_avg(episodes, names, r_saves)
+    plt.title(f"Avg. Rewards -- last 100")
+
+    plt.subplot(2, 1, 2)
+    plot_curve_avg(episodes, names, step_saves)
+    plt.title(f"Avg. Steps -- last 100")
+    savefig(f"all-learning_curve-last-100.png")
 
 
 def evaluate_agent(name, reward):
@@ -52,14 +73,14 @@ def evaluate_agent(name, reward):
     plt.plot(x, [avg] * len(x))
     plt.grid(True)
     plt.legend()
-    plt.savefig(config.model_data_file(f"{name}-learning_curve.png"))
+    savefig(f"{name}-learning_curve.png")
 
     plt.figure()
     plt.plot([i + 1 for i in range(100, len(reward))], generate_moving_avg(reward), label="Average last 100")
     plt.plot(x, [avg] * len(x))
     plt.grid(True)
     plt.legend()
-    plt.savefig(config.model_data_file(f"{name}-learning_curve_clean.png"))
+    savefig(f"{name}-learning_curve_clean.png")
 
     if len(reward) < 100:
         return
@@ -71,19 +92,19 @@ def evaluate_agent(name, reward):
     plt.plot(x, [avg] * len(x))
     plt.grid(True)
     plt.legend()
-    plt.savefig(config.model_data_file(f"{name}-learning_curve_last_100.png"))
+    savefig(f"{name}-learning_curve_last_100.png")
 
 
 def genrate_box_plots(name, reward):
     plt.figure()
     df = pandas.DataFrame({'Reward': reward[-100:]})
     df.boxplot()
-    plt.savefig(config.model_data_file(f"{name}-boxplot_last_100.png"))
+    savefig(f"{name}-boxplot_last_100.png")
 
     plt.figure()
     df = pandas.DataFrame({'Reward': reward, })
     df.boxplot()
-    plt.savefig(config.model_data_file(f"{name}-boxplot_all.png"))
+    savefig(f"{name}-boxplot_all.png")
 
 
 def generate_moving_avg(reward, last=100):
@@ -98,11 +119,13 @@ if __name__ == '__main__':
     names = []
     rewards = []
     moves = []
-    N_episodes = 10000  # THE NUMBER OF GAMES TO BE PLAYED
+    N_episodes = 20000
 
+    plt.rcParams['figure.figsize'] = [15, 7]
     for agent in [SarsaChessyAgent, QLearningChessyAgent,
                   DoubleSARSAChessyAgent, DoubleQLearningChessyAgent]:
         name, reward, move = agent(N_episodes).run(print_to_console)
+        dump_file([name, reward, move], f"{name}_model_content")
         evaluate_agent(name, reward)
         genrate_box_plots(name, reward)
         names.append(name)
