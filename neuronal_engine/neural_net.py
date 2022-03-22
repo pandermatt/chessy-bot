@@ -44,7 +44,8 @@ class NeuralNet:
         avg_moves = np.zeros(N_episodes)
 
         for n in range(N_episodes):
-            epsilon_f = self.epsilon_0 / (1 + self.beta * n)  # DECAYING EPSILON
+            epsilon_f = self.epsilon_0 / \
+                (1 + self.beta * n)  # DECAYING EPSILON
             move_counter = 1
 
             S, X, allowed_a = self.env.initialise_game()
@@ -58,9 +59,11 @@ class NeuralNet:
                 if self.type == SARSA and a_agent_next is not None and qvalue_next is not None:
                     a_agent, qvalue = a_agent_next, qvalue_next
                 else:
-                    a_agent, qvalue = epsilon_greedy_policy(x[-1], a, epsilon_f)
+                    a_agent, qvalue = epsilon_greedy_policy(
+                        x[-1], a, epsilon_f)
 
-                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent, i)
+                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(
+                    a_agent, i)
 
                 if Done == 1:
                     R_save[n] = np.copy(R)
@@ -91,7 +94,8 @@ class NeuralNet:
 
                 move_counter += 1
             else:
-                log.error(f"Invalid Epoche. Epoche was longer than {MAX_STEPS_ALLOWED}")
+                log.error(
+                    f"Invalid Epoche. Epoche was longer than {MAX_STEPS_ALLOWED}")
 
             callback(self, S, n, N_episodes, R_save, N_moves_save)
 

@@ -47,7 +47,8 @@ class PropagationHandler:
                 delta = x[-1] * (1 - x[-1]) * e_n
             else:
                 # TODO: delta falsch?
-                delta = (x[-(idx + 1)] * (1 - x[-(idx + 1)]) * np.dot(np.transpose(weights[-idx]), delta))
+                delta = (x[-(idx + 1)] * (1 - x[-(idx + 1)]) *
+                         np.dot(np.transpose(weights[-idx]), delta))
             dweights[-(idx + 1)] += np.outer(delta, x[-(idx + 2)])
             dbiases[-(idx + 1)] += delta
 
