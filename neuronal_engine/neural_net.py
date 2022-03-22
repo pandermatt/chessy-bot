@@ -1,11 +1,9 @@
 # Import
 
 from generate_game import *
-from neuronal_engine.helper import initialize_weights, epsilon_greedy_policy
-from neuronal_engine.propagation_handler import (
-    PropagationHandler,
-    DoublePropagationHandler,
-)
+from neuronal_engine.helper import epsilon_greedy_policy, initialize_weights
+from neuronal_engine.propagation_handler import (DoublePropagationHandler,
+                                                 PropagationHandler)
 from util.logger import log
 
 SARSA = "sarsa"
