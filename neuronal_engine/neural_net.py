@@ -7,7 +7,7 @@ from util.logger import log
 
 SARSA = 'sarsa'
 QLEARNING = 'q-learning'
-MAX_STEPS_ALLOWED = 500
+MAX_STEPS_ALLOWED = 1000
 
 
 class NeuralNet:
@@ -51,7 +51,7 @@ class NeuralNet:
 
             a_agent_next, qvalue_next = None, None
 
-            for _ in range(MAX_STEPS_ALLOWED):
+            for i in range(MAX_STEPS_ALLOWED):
                 a, _ = np.where(allowed_a == 1)
                 x = self.prop.forward_pass(X)
 
@@ -60,7 +60,7 @@ class NeuralNet:
                 else:
                     a_agent, qvalue = epsilon_greedy_policy(x[-1], a, epsilon_f)
 
-                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
+                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent, i)
 
                 if Done == 1:
                     R_save[n] = np.copy(R)
@@ -91,7 +91,7 @@ class NeuralNet:
 
                 move_counter += 1
             else:
-                log.error(f"Epoche was longer than {MAX_STEPS_ALLOWED}")
+                log.error(f"Invalid Epoche. Epoche was longer than {MAX_STEPS_ALLOWED}")
 
             callback(self, S, n, N_episodes, R_save, N_moves_save)
 
