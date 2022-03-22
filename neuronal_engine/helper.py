@@ -11,7 +11,8 @@ def epsilon_greedy_policy(Qvalues, a, epsilon):
     else:
         a = a[np.argmax(Qvalues[a])]
 
-    qvalue = Qvalues[a]
+    qvalue = np.zeros(len(Qvalues))
+    qvalue[a] = Qvalues[a]
 
     return a, qvalue
 
