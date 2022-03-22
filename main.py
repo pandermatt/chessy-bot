@@ -1,12 +1,19 @@
 import numpy as np
+import pandas
 from matplotlib import pyplot as plt
 
 from agents.chessy_agent import QLearningChessyAgent, DoubleQLearningChessyAgent, \
     DoubleSARSAChessyAgent, SarsaChessyAgent
+from config import config
 from util.logger import log
 from util.storage_io import dump_file
 
 intern_output_nr = 500
+
+
+def savefig(filename):
+    plt.tight_layout()
+    plt.savefig(config.model_data_file(filename), transparent="True", pad_inches=0)
 
 
 def print_to_console(nn, _, n, N_episodes, R_save, N_moves_save):
@@ -17,25 +24,91 @@ def print_to_console(nn, _, n, N_episodes, R_save, N_moves_save):
                  + f"Number of steps: {np.mean(N_moves_save[(n - intern_output_nr):n])}")
 
 
+def plot_curve(episodes, names, value):
+    for idx in range(len(names)):
+        plt.plot(episodes, value[idx], label=names[idx])
+    plt.legend()
+    plt.grid(True)
+
+
+def plot_curve_avg(episodes, names, value):
+    for idx in range(len(names)):
+        plt.plot([i + 1 for i in range(100, len(value[idx]))], generate_moving_avg(value[idx]),
+                 label=f"{names[idx]}")
+    plt.legend()
+    plt.grid(True)
+
+
 def print_stats(n_episodes, names, r_saves, step_saves):
     episodes = range(n_episodes)
     plt.subplots_adjust(wspace=1, hspace=0.3)
 
-    count = len(names)
-
     plt.subplot(2, 1, 1)
-    for idx in range(count):
-        plt.plot(episodes, r_saves[idx], label=names[idx])
+    plot_curve(episodes, names, r_saves)
     plt.title(f"Avg. Rewards")
-    plt.legend()
 
     plt.subplot(2, 1, 2)
-    for idx in range(count):
-        plt.plot(episodes, step_saves[idx], label=names[idx])
-    plt.title(f"Avg. Steps ")
-    plt.legend()
+    plot_curve(episodes, names, step_saves)
+    plt.title(f"Avg. Steps")
+    savefig(f"all-learning_curve.png")
 
-    plt.show()
+    plt.figure()
+    plt.subplot(2, 1, 1)
+    plot_curve_avg(episodes, names, r_saves)
+    plt.title(f"Avg. Rewards -- last 100")
+
+    plt.subplot(2, 1, 2)
+    plot_curve_avg(episodes, names, step_saves)
+    plt.title(f"Avg. Steps -- last 100")
+    savefig(f"all-learning_curve-last-100.png")
+
+
+def evaluate_agent(name, reward):
+    plt.figure()
+    plt.plot([i + 1 for i in range(0, len(reward))], reward, label="Learning Curve")
+    plt.plot([i + 1 for i in range(50, len(reward))], generate_moving_avg(reward, last=50), label="Average last 50")
+
+    avg = np.average(reward)
+    x = np.linspace(0, len(reward))
+    plt.plot(x, [avg] * len(x))
+    plt.grid(True)
+    plt.legend()
+    savefig(f"{name}-learning_curve.png")
+
+    plt.figure()
+    plt.plot([i + 1 for i in range(100, len(reward))], generate_moving_avg(reward), label="Average last 100")
+    plt.plot(x, [avg] * len(x))
+    plt.grid(True)
+    plt.legend()
+    savefig(f"{name}-learning_curve_clean.png")
+
+    if len(reward) < 100:
+        return
+
+    plt.figure()
+    plt.plot([i + 1 for i in range(len(reward) - 100, len(reward))], reward[-100:],
+             label="Learning Curve")
+    x = np.linspace(len(reward) - 100, len(reward))
+    plt.plot(x, [avg] * len(x))
+    plt.grid(True)
+    plt.legend()
+    savefig(f"{name}-learning_curve_last_100.png")
+
+
+def genrate_box_plots(name, reward):
+    plt.figure()
+    df = pandas.DataFrame({'Reward': reward[-100:]})
+    df.boxplot()
+    savefig(f"{name}-boxplot_last_100.png")
+
+    plt.figure()
+    df = pandas.DataFrame({'Reward': reward, })
+    df.boxplot()
+    savefig(f"{name}-boxplot_all.png")
+
+
+def generate_moving_avg(reward, last=100):
+    return [np.average(reward[i - last:i]) for i in range(last, len(reward))]
 
 
 if __name__ == '__main__':
@@ -43,14 +116,21 @@ if __name__ == '__main__':
 
     # FirstFiveAgent().run()
     # RandomAgent().run()
+    names = []
+    rewards = []
+    moves = []
+    N_episodes = 20000
 
-    N_episodes = 20000  # THE NUMBER OF GAMES TO BE PLAYED
-    name1, reward1, moves1 = SarsaChessyAgent(N_episodes).run(print_to_console)
-    name2, reward2, moves2 = QLearningChessyAgent(N_episodes).run(print_to_console)
-    name3, reward3, moves3 = DoubleSARSAChessyAgent(N_episodes).run(print_to_console)
-    name4, reward4, moves4 = DoubleQLearningChessyAgent(N_episodes).run(print_to_console)
+    plt.rcParams['figure.figsize'] = [15, 7]
+    for agent in [SarsaChessyAgent, QLearningChessyAgent,
+                  DoubleSARSAChessyAgent, DoubleQLearningChessyAgent]:
+        name, reward, move = agent(N_episodes).run(print_to_console)
+        dump_file([name, reward, move], f"{name}_model_content")
+        evaluate_agent(name, reward)
+        genrate_box_plots(name, reward)
+        names.append(name)
+        rewards.append(reward)
+        moves.append(move)
+    plt.close('all')
 
-    names = [name1, name2, name3, name4]
-    rewards = [reward1, reward2, reward3, reward4]
-    moves = [moves1, moves2, moves3, moves4]
     print_stats(N_episodes, names, rewards, moves)
