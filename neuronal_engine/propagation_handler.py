@@ -16,7 +16,7 @@ class PropagationHandler:
         h = []
         for idx in range(len(weights)):
             h.append(np.dot(weights[idx], x[-1]) + biases[idx])
-            x.append(1 / (1 + np.exp(-h[-1])))
+            x.append(np.maximum(0.1*h[-1], h[-1]))
 
         return x
 

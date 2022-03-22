@@ -7,7 +7,7 @@ from util.logger import log
 
 SARSA = 'sarsa'
 QLEARNING = 'q-learning'
-MAX_STEPS_ALLOWED = 150
+MAX_STEPS_ALLOWED = 500
 
 
 class NeuralNet:
@@ -83,7 +83,7 @@ class NeuralNet:
                     a_agent_next, qvalue_next = epsilon_greedy_policy(
                         x_next[-1], a_next,
                         epsilon_f if self.type == SARSA else 0)
-                    self.prop.backprop(x, a, R, qvalue, Done, qvalue_next)
+                    self.prop.backprop(x, a_agent, R, qvalue, Done, qvalue_next)
 
                 S = np.copy(S_next)
                 X = np.copy(X_next)
