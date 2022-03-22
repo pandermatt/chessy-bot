@@ -4,6 +4,7 @@ import numpy as np
 
 
 class PropagationHandler:
+
     def __init__(self, nn):
         self.nn = nn
 
@@ -34,9 +35,8 @@ class PropagationHandler:
             self.nn.adam_b,
         )
 
-    def _execute_backprop(
-        self, x, a, R, qvalue, Done, qvalue_next, weights, biases, adam_w, adam_b
-    ):
+    def _execute_backprop(self, x, a, R, qvalue, Done, qvalue_next, weights,
+                          biases, adam_w, adam_b):
         dweights = []
         dbiases = []
 
@@ -54,22 +54,19 @@ class PropagationHandler:
                 if Done == 1:
                     e_n = self._error_func_done(R, qvalue, action_taken)
                 else:
-                    e_n = self._error_func_not_done(
-                        R, qvalue, qvalue_next, action_taken
-                    )
+                    e_n = self._error_func_not_done(R, qvalue, qvalue_next,
+                                                    action_taken)
                 delta = x[-1] * (1 - x[-1]) * e_n
             else:
                 # TODO: delta falsch?
-                delta = (
-                    x[-(idx + 1)]
-                    * (1 - x[-(idx + 1)])
-                    * np.dot(np.transpose(weights[-idx]), delta)
-                )
+                delta = (x[-(idx + 1)] * (1 - x[-(idx + 1)]) *
+                         np.dot(np.transpose(weights[-idx]), delta))
             dweights[-(idx + 1)] += np.outer(delta, x[-(idx + 2)])
             dbiases[-(idx + 1)] += delta
 
         for idx in range(len(weights)):
-            weights[idx] += self.nn.eta * adam_w[idx].Compute(dweights[idx]) * x[idx]
+            weights[idx] += self.nn.eta * adam_w[idx].Compute(
+                dweights[idx]) * x[idx]
             biases[idx] += self.nn.eta * adam_b[idx].Compute(dbiases[idx])
 
     @staticmethod
@@ -81,20 +78,25 @@ class PropagationHandler:
 
 
 class DoublePropagationHandler(PropagationHandler):
+
     def forward_pass(self, X):
         if self.nn.counter == 0:
             self.nn.counter += 1
             self.nn.choice = random.randint(0, 1)
             if self.nn.choice:
-                return self._execute_forwardpass(X, self.nn.weights2, self.nn.biases2)
+                return self._execute_forwardpass(X, self.nn.weights2,
+                                                 self.nn.biases2)
             else:
-                return self._execute_forwardpass(X, self.nn.weights, self.nn.biases)
+                return self._execute_forwardpass(X, self.nn.weights,
+                                                 self.nn.biases)
         else:
             self.nn.counter = 0
             if self.nn.choice:
-                return self._execute_forwardpass(X, self.nn.weights, self.nn.biases)
+                return self._execute_forwardpass(X, self.nn.weights,
+                                                 self.nn.biases)
             else:
-                return self._execute_forwardpass(X, self.nn.weights2, self.nn.biases2)
+                return self._execute_forwardpass(X, self.nn.weights2,
+                                                 self.nn.biases2)
 
     def backprop(self, x, a, R, qvalue, Done, qvalue_next=0):
         if self.nn.choice:
