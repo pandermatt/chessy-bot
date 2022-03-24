@@ -42,7 +42,7 @@ def update_load():
                                }
                 turbo.push(turbo.replace(render_template('chess_board.html'), 'load'))
 
-        QTableAgent(60000).run(update_web)
+        QTableAgent(300000).run(update_web)
 
 
 def calculate_location(S):

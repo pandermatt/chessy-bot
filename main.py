@@ -117,14 +117,12 @@ def generate_moving_avg(reward, last=100):
 if __name__ == '__main__':
     board_size = 4
 
-    # FirstFiveAgent().run()
-    # RandomAgent().run()
     names = []
     rewards = []
     moves = []
     N_episodes = 500000
 
-    plt.rcParams['figure.figsize'] = [15, 7]
+    plt.rcParams['figure.figsize'] = [10, 5]
     for agent_class in [QTableAgent]:
         # ,
         #           SarsaChessyAgent, QLearningChessyAgent,
