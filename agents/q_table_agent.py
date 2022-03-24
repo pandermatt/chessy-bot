@@ -3,17 +3,17 @@ import random
 import numpy as np
 
 from agents.agent import Agent
+from chess_env import ChessEnv
 from neuronal_engine.helper import finished
 from util.logger import log
 
 
 class QTableAgent(Agent):
-    NAME = 'Q Table Agent'
+    NAME = 'Q-learning with Q-table'
 
     def __init__(self, N_episodes):
         super().__init__()
         self.N_episodes = N_episodes
-        self._name = self.NAME
 
     def generate_qvalues(self, q_table, a, X):
         key = tuple(X)
@@ -37,6 +37,7 @@ class QTableAgent(Agent):
         return a, qvalue
 
     def run(self, callback=lambda *args: None):
+        super().run()
         epsilon_0 = 0.2  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
         beta = 0.00005  # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
         gamma = 0.85  # THE DISCOUNT FACTOR
@@ -88,4 +89,12 @@ class QTableAgent(Agent):
 
                 move_counter += 1
 
-        return self._name, R_save, N_moves_save
+        return self.NAME, R_save, N_moves_save
+
+
+class QTableAgentCustomReward(QTableAgent):
+    NAME = 'Q-learning with Q-table with negative reward'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_step=-0.1, reward_draw=0, reward_checkmate=1)

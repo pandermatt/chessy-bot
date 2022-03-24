@@ -4,11 +4,11 @@ from generate_game import *
 
 class ChessEnv:
 
-    def __init__(self, n_grid):
+    def __init__(self, n_grid, reward_step=0, reward_draw=0, reward_checkmate=1):
 
-        self.reward_step = 0
-        self.reward_draw = 0
-        self.reward_checkmate = 1
+        self.reward_step = reward_step
+        self.reward_draw = reward_draw
+        self.reward_checkmate = reward_checkmate
 
         self.N_grid = n_grid  # SIZE OF THE BOARD
 
