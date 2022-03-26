@@ -9,15 +9,6 @@ from neuronal_engine.helper import AIM
 def generate_multi_plot(names, r_saves, step_saves):
     plt.subplots_adjust(wspace=1, hspace=0.3)
 
-    plt.subplot(2, 1, 1)
-    plot_curve(names, r_saves)
-    plt.title(f"Avg. Rewards")
-
-    plt.subplot(2, 1, 2)
-    plot_curve(names, step_saves)
-    plt.title(f"Avg. Steps")
-    savefig(f"all-learning_curve.png")
-
     plt.figure()
     plt.subplot(2, 1, 1)
     plot_curve_avg(names, r_saves, suffix=" -- last 100")
@@ -36,8 +27,8 @@ def generate_multi_plot(names, r_saves, step_saves):
     plt.title(f"Avg. Rewards -- last 500")
 
     plt.subplot(2, 1, 2)
-    plot_curve_avg(names, step_saves, last=1000)
-    plt.title(f"Avg. Steps -- last 100")
+    plot_curve_avg(names, step_saves, last=500)
+    plt.title(f"Avg. Steps -- last 500")
     savefig(f"all-learning_curve-clean.png")
 
 

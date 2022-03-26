@@ -98,3 +98,11 @@ class QTableAgentCustomReward(QTableAgent):
     def __init__(self, N_episodes):
         super().__init__(N_episodes)
         self.env = ChessEnv(4, reward_step=-0.1, reward_draw=0, reward_checkmate=1)
+
+
+class QTableAgentCustomReward2(QTableAgent):
+    NAME = 'Q-learning with Q-table with negative reward (-0.2)'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_step=-0.2, reward_draw=0, reward_checkmate=1)

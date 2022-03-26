@@ -1,6 +1,6 @@
 import numpy as np
 
-from agents.q_table_agent import QTableAgent, QTableAgentCustomReward
+from agents.q_table_agent import QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2
 from util.logger import log
 from util.plotting import generate_multi_plot, \
     generate_singe_plot
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     moves = []
     N_episodes = 300000
 
-    for agent_class in [QTableAgent, QTableAgentCustomReward]:
+    for agent_class in [QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2]:
         agent = agent_class(N_episodes)
         model_filename = f"{agent.clean_name()}_model_content"
 
@@ -33,8 +33,8 @@ if __name__ == '__main__':
             name, reward, move = agent.run(print_to_console)
             dump_file([name, reward, move], model_filename)
         log.info(f'Finished with {len(reward)} Epochs')
-        log.info('Generating plots...')
-
+        log.info(f'Generating plots for: {name}...')
+        name = agent.clean_name()
         generate_singe_plot(name, reward, move)
 
         names.append(name)
