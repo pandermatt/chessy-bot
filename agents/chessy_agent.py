@@ -1,11 +1,12 @@
 import numpy as np
 
 from agents.agent import Agent
-from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, DoubleSarsaNn
-from util.storage_io import is_model_present, load_file
+from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, DoubleSarsaNn, NeuralNet
 
 
 class ChessyAgent(Agent):
+    NN_KLASS = NeuralNet
+
     def __init__(self, N_episodes):
         super().__init__()
         self.N_episodes = N_episodes
@@ -24,36 +25,25 @@ class ChessyAgent(Agent):
         return [N_in, N_h1, N_h2, N_a]
 
     def run(self, callback=lambda *args: None):
-        pass
+        nn = self.NN_KLASS(self, xavier=True)
+        return nn.train(self.N_episodes, callback)
 
 
 class SarsaChessyAgent(ChessyAgent):
     NAME = "SARSA ChessyAgent"
-
-    def run(self, callback=lambda *args: None):
-        nn = SarsaNn(self.env, self._get_layer_sizes(), xavier=True)
-        return nn.train(self.N_episodes, callback)
+    NN_KLASS = SarsaNn
 
 
 class QLearningChessyAgent(ChessyAgent):
     NAME = "Q-learning ChessyAgent"
-
-    def run(self, callback=lambda *args: None):
-        nn = QlearningNn(self.env, self._get_layer_sizes(), xavier=True)
-        return nn.train(self.N_episodes, callback)
+    NN_KLASS = QlearningNn
 
 
 class DoubleQLearningChessyAgent(ChessyAgent):
     NAME = "Double-Q-learning ChessyAgent"
-
-    def run(self, callback=lambda *args: None):
-        nn = DoubleQlearningNn(self.env, self._get_layer_sizes(), xavier=True)
-        return nn.train(self.N_episodes, callback)
+    NN_KLASS = DoubleQlearningNn
 
 
 class DoubleSARSAChessyAgent(ChessyAgent):
     NAME = "Double-SARSA-learning ChessyAgent"
-
-    def run(self, callback=lambda *args: None):
-        nn = DoubleSarsaNn(self.env, self._get_layer_sizes(), xavier=True)
-        return nn.train(self.N_episodes, callback)
+    NN_KLASS = DoubleSarsaNn

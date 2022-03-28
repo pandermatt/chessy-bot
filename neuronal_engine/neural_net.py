@@ -1,7 +1,7 @@
 # Import
 
 from generate_game import *
-from neuronal_engine.helper import initialize_weights, epsilon_greedy_policy
+from neuronal_engine.helper import initialize_weights, epsilon_greedy_policy, finished
 from neuronal_engine.propagation_handler import PropagationHandler, DoublePropagationHandler
 from util.logger import log
 
@@ -11,10 +11,10 @@ MAX_STEPS_ALLOWED = 1000
 
 
 class NeuralNet:
-    def __init__(self, env, layer_sizes, xavier=False):
-        self._name = "chessy bot"
-        self.env = env
-        self.layer_sizes = layer_sizes
+    def __init__(self, agent, xavier=False):
+        self.agent = agent
+        self.env = agent.env
+        self.layer_sizes = agent._get_layer_sizes()
         self.xavier = xavier
         self.epsilon_0 = 0.25  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
         # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
@@ -37,11 +37,9 @@ class NeuralNet:
                            self.xavier)
 
     def train(self, N_episodes, callback):
-        R_save = np.zeros([N_episodes, 1])
-        avg_reward = np.zeros(N_episodes)
         checkmate_save = np.zeros(N_episodes)
-        N_moves_save = np.zeros([N_episodes, 1])
-        avg_moves = np.zeros(N_episodes)
+        N_moves_save = []
+        R_save = []
 
         for n in range(N_episodes):
             epsilon_f = self.epsilon_0 / (1 + self.beta * n)  # DECAYING EPSILON
@@ -50,6 +48,12 @@ class NeuralNet:
             S, X, allowed_a = self.env.initialise_game()
 
             a_agent_next, qvalue_next = None, None
+
+            callback(self.agent, S, n, N_episodes, R_save, N_moves_save)
+            if finished(R_save, n):
+                log.info(f'Finished with {n}')
+                callback(self.agent, S, n, N_episodes, R_save, N_moves_save)
+                break
 
             for i in range(MAX_STEPS_ALLOWED):
                 a, _ = np.where(allowed_a == 1)
@@ -60,22 +64,14 @@ class NeuralNet:
                 else:
                     a_agent, qvalue = epsilon_greedy_policy(x[-1], a, epsilon_f)
 
-                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent, i)
+                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
 
                 if Done == 1:
-                    R_save[n] = np.copy(R)
-                    N_moves_save[n] = np.copy(move_counter)
-                    checkmate_save[n] = np.copy(R)
-
-                    if n > 0:
-                        avg_reward[n] = np.mean(R_save[0:n])
-                        avg_moves[n] = np.mean(N_moves_save[0:n])
-                    else:
-                        avg_reward[n] = R_save[n]
-                        avg_moves[n] = N_moves_save[n]
-
                     self.prop.backprop(x, h, a_agent, R, qvalue, Done)
 
+                    checkmate_save[n] = np.copy(R)
+                    R_save.append(R)
+                    N_moves_save.append(move_counter)
                     break
                 else:
                     a_next, _ = np.where(allowed_a_next == 1)
@@ -93,12 +89,10 @@ class NeuralNet:
             else:
                 log.error(f"Invalid Epoche. Epoche was longer than {MAX_STEPS_ALLOWED}")
 
-            callback(self, S, n, N_episodes, R_save, N_moves_save)
-
-        log.info(f"{self._name}, Average reward: {np.mean(R_save)}")
+        log.info(f"{self.agent.NAME}, Average reward: {np.mean(R_save)}")
         log.info(f"Number of steps: {np.mean(N_moves_save)}")
         log.info(f"Checkmates: {np.count_nonzero(checkmate_save > 0)}")
-        return self._name, avg_reward, avg_moves
+        return self.agent.NAME, R_save, N_moves_save
 
 
 class SarsaNn(NeuralNet):
@@ -106,7 +100,6 @@ class SarsaNn(NeuralNet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._name = "SARSA BOT"
 
 
 class QlearningNn(NeuralNet):
@@ -114,7 +107,6 @@ class QlearningNn(NeuralNet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._name = "QLEARNING BOT"
 
 
 class DoubleQlearningNn(NeuralNet):
@@ -122,7 +114,6 @@ class DoubleQlearningNn(NeuralNet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._name = "DOUBLE-QLEARNING BOT"
         self.weights2 = []
         self.biases2 = []
         self.adam_w2 = []
@@ -142,4 +133,3 @@ class DoubleSarsaNn(DoubleQlearningNn):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._name = "DOUBLE-SARSA BOT"
