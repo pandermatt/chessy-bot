@@ -1,7 +1,6 @@
 import numpy as np
 
-from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent, DoubleQLearningChessyAgent, \
-    DoubleSARSAChessyAgent
+from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent
 from agents.q_table_agent import QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2
 from util.logger import log
 from util.plotting import generate_multi_plot, \
@@ -20,6 +19,11 @@ def print_to_console(agent, _, n, N_episodes, R_save, N_moves_save):
 
 
 def run_for_agents(agent_class_list):
+    file_names = []
+    names = []
+    rewards = []
+    moves = []
+
     for agent_class in agent_class_list:
         agent = agent_class(N_episodes)
         model_filename = f"{agent.clean_name()}_model_content"
@@ -31,20 +35,18 @@ def run_for_agents(agent_class_list):
             dump_file([name, reward, move], model_filename)
         log.info(f'Finished with {len(reward)} Epochs')
         log.info(f'Generating plots for: {name}...')
-        name = agent.clean_name()
-        generate_singe_plot(name, reward, move)
+        file_name = agent.clean_name()
+        generate_singe_plot(file_name, reward, move)
 
+        file_names.append(file_name)
         names.append(name)
         rewards.append(reward)
         moves.append(move)
-    generate_multi_plot(names, rewards, moves)
+    generate_multi_plot(file_names, names, rewards, moves)
 
 
 if __name__ == '__main__':
-    names = []
-    rewards = []
-    moves = []
-    N_episodes = 50000
+    N_episodes = 500000
 
     # compare deep nets
     run_for_agents([SarsaChessyAgent,
