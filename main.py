@@ -1,6 +1,6 @@
 import numpy as np
 
-from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent
+from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent, SarsaChessyAgentCustomReward
 from agents.q_table_agent import QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2
 from util.logger import log
 from util.plotting import generate_multi_plot, \
@@ -51,10 +51,15 @@ if __name__ == '__main__':
     # compare deep nets
     run_for_agents([SarsaChessyAgent,
                     QLearningChessyAgent,
-                    DoubleQLearningChessyAgent,
-                    DoubleSARSAChessyAgent])
+                    QTableAgent])
+
+    run_for_agents([SarsaChessyAgent,
+                    QLearningChessyAgent])
 
     # compare q_tables
     run_for_agents([QTableAgent,
                     QTableAgentCustomReward,
                     QTableAgentCustomReward2])
+
+    run_for_agents([SarsaChessyAgent,
+                    SarsaChessyAgentCustomReward])

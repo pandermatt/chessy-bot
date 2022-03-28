@@ -98,15 +98,9 @@ class NeuralNet:
 class SarsaNn(NeuralNet):
     type = SARSA
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 
 class QlearningNn(NeuralNet):
     type = QLEARNING
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class DoubleQlearningNn(NeuralNet):
@@ -130,6 +124,3 @@ class DoubleQlearningNn(NeuralNet):
 
 class DoubleSarsaNn(DoubleQlearningNn):
     type = SARSA
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)

@@ -19,7 +19,7 @@ def generate_multi_plot(file_names, names, r_saves, step_saves):
     plot_curve_avg(names, step_saves, suffix=" -- last 100")
     plot_curve_avg(names, step_saves, last=500, suffix=" -- last 500")
     plt.title(f"Avg. Steps")
-    savefig(f"{'-'.join(file_names)}-learning_curve-100_500_avg.png")
+    savefig(f"multi-plot-{'-'.join(file_names)}-learning_curve-100_500_avg.png")
 
     plt.figure()
     plt.subplot(2, 1, 1)
@@ -29,7 +29,7 @@ def generate_multi_plot(file_names, names, r_saves, step_saves):
     plt.subplot(2, 1, 2)
     plot_curve_avg(names, step_saves, last=500)
     plt.title(f"Avg. Steps -- last 500")
-    savefig(f"{'-'.join(file_names)}-learning_curve-clean.png")
+    savefig(f"multi-plot-{'-'.join(file_names)}-learning_curve-clean.png")
 
 
 def generate_singe_plot(name, reward, move):
@@ -42,7 +42,7 @@ def savefig(filename):
     plt.xlabel("Epoch")
     plt.ylabel("Reward")
     plt.tight_layout()
-    plt.rcParams['figure.figsize'] = [8, 5]
+    plt.rcParams['figure.figsize'] = [17, 10]
     plt.savefig(config.model_data_file(filename), transparent="True", pad_inches=0)
 
 

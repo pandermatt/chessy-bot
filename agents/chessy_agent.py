@@ -1,6 +1,7 @@
 import numpy as np
 
 from agents.agent import Agent
+from chess_env import ChessEnv
 from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, DoubleSarsaNn, NeuralNet
 
 
@@ -32,6 +33,14 @@ class ChessyAgent(Agent):
 class SarsaChessyAgent(ChessyAgent):
     NAME = "SARSA"
     NN_KLASS = SarsaNn
+
+
+class SarsaChessyAgentCustomReward(SarsaChessyAgent):
+    NAME = 'SARSA with negative reward'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_step=-0.1, reward_draw=0, reward_checkmate=1)
 
 
 class QLearningChessyAgent(ChessyAgent):
