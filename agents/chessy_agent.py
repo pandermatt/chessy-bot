@@ -53,6 +53,6 @@ class DoubleQLearningChessyAgent(ChessyAgent):
     NN_KLASS = DoubleQlearningNn
 
 
-class DoubleSARSAChessyAgent(ChessyAgent):
+class DoubleSarsaChessyAgent(ChessyAgent):
     NAME = "Double-SARSA-learning"
     NN_KLASS = DoubleSarsaNn

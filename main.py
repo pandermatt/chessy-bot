@@ -1,6 +1,7 @@
 import numpy as np
 
-from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent, SarsaChessyAgentCustomReward
+from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent, SarsaChessyAgentCustomReward, \
+    DoubleQLearningChessyAgent, DoubleSarsaChessyAgent
 from agents.q_table_agent import QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2
 from util.logger import log
 from util.plotting import generate_multi_plot, \
@@ -18,7 +19,7 @@ def print_to_console(agent, _, n, N_episodes, R_save, N_moves_save):
                  + f"Number of steps: {np.mean(N_moves_save[(n - intern_output_nr):n])}")
 
 
-def run_for_agents(agent_class_list):
+def run_and_compare(agent_class_list):
     file_names = []
     names = []
     rewards = []
@@ -49,17 +50,19 @@ if __name__ == '__main__':
     N_episodes = 500000
 
     # compare deep nets
-    run_for_agents([SarsaChessyAgent,
-                    QLearningChessyAgent,
-                    QTableAgent])
+    run_and_compare([SarsaChessyAgent,
+                     QLearningChessyAgent,
+                     QTableAgent])
 
-    run_for_agents([SarsaChessyAgent,
-                    QLearningChessyAgent])
+    run_and_compare([SarsaChessyAgent,
+                     QLearningChessyAgent,
+                     DoubleSarsaChessyAgent,
+                     DoubleQLearningChessyAgent])
 
     # compare q_tables
-    run_for_agents([QTableAgent,
-                    QTableAgentCustomReward,
-                    QTableAgentCustomReward2])
+    run_and_compare([QTableAgent,
+                     QTableAgentCustomReward,
+                     QTableAgentCustomReward2])
 
-    run_for_agents([SarsaChessyAgent,
-                    SarsaChessyAgentCustomReward])
+    run_and_compare([SarsaChessyAgent,
+                     SarsaChessyAgentCustomReward])
