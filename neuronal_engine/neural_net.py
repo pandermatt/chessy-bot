@@ -53,7 +53,7 @@ class NeuralNet:
 
             for i in range(MAX_STEPS_ALLOWED):
                 a, _ = np.where(allowed_a == 1)
-                x = self.prop.forward_pass(X)
+                x, h = self.prop.forward_pass(X)
 
                 if self.type == SARSA and a_agent_next is not None and qvalue_next is not None:
                     a_agent, qvalue = a_agent_next, qvalue_next
@@ -74,16 +74,16 @@ class NeuralNet:
                         avg_reward[n] = R_save[n]
                         avg_moves[n] = N_moves_save[n]
 
-                    self.prop.backprop(x, a, R, qvalue, Done)
+                    self.prop.backprop(x, h, a_agent, R, qvalue, Done)
 
                     break
                 else:
                     a_next, _ = np.where(allowed_a_next == 1)
-                    x_next = self.prop.forward_pass(X_next)
+                    x_next, _ = self.prop.forward_pass(X_next)
                     a_agent_next, qvalue_next = epsilon_greedy_policy(
                         x_next[-1], a_next,
                         epsilon_f if self.type == SARSA else 0)
-                    self.prop.backprop(x, a_agent, R, qvalue, Done, qvalue_next)
+                    self.prop.backprop(x, h, a_agent, R, qvalue, Done, qvalue_next)
 
                 S = np.copy(S_next)
                 X = np.copy(X_next)

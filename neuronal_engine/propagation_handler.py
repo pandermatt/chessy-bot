@@ -18,20 +18,15 @@ class PropagationHandler:
             h.append(np.dot(weights[idx], x[-1]) + biases[idx])
             x.append(np.maximum(0.1*h[-1], h[-1]))
 
-        return x
+        return x, h
 
-    def backprop(self, x, a, R, qvalue, Done, qvalue_next=0):
-        self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.nn.weights, self.nn.biases, self.nn.adam_w,
+    def backprop(self, x, h, a, R, qvalue, Done, qvalue_next=0):
+        self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next, self.nn.weights, self.nn.biases, self.nn.adam_w,
                                self.nn.adam_b)
 
-    def _execute_backprop(self, x, a, R, qvalue, Done, qvalue_next, weights, biases, adam_w, adam_b):
+    def _execute_backprop(self, x, h, a, R, qvalue, Done, qvalue_next, weights, biases, adam_w, adam_b):
         dweights = []
         dbiases = []
-
-        action_taken = np.zeros(len(x[-1]))
-        action_taken[a] = 1
-
-        x[-1] = action_taken * qvalue
 
         for idx in range(len(weights)):
             dweights.append(np.zeros(weights[idx].shape))
@@ -40,30 +35,26 @@ class PropagationHandler:
         for idx in range(len(weights)):
             if idx == 0:
                 if Done == 1:
-                    e_n = self._error_func_done(R, qvalue, action_taken)
+                    e_n = self._error_func_done(R, qvalue)
                 else:
-                    e_n = self._error_func_not_done(R, qvalue, qvalue_next,
-                                                    action_taken)
-                delta = x[-1] * (1 - x[-1]) * e_n
+                    e_n = self._error_func_not_done(R, qvalue, qvalue_next)
+                dweights[-1][a, :] = e_n * x[-2]
+                dbiases[-1][a] = self.nn.eta * e_n
             else:
-                # TODO: delta falsch?
-                delta = (x[-(idx + 1)] * (1 - x[-(idx + 1)]) * np.dot(np.transpose(weights[-idx]), delta))
-            dweights[-(idx + 1)] += np.outer(delta, x[-(idx + 2)])
-            dbiases[-(idx + 1)] += delta
+                dweights[-(idx + 1)] = np.outer(e_n * weights[-1][a, :] * np.heaviside(h[-(idx + 1)], 0), x[-(idx + 2)])
+                dbiases[-(idx + 1)] = self.nn.eta * e_n * weights[-1][a, :] * np.heaviside(h[-(idx + 1)], 0)
 
         for idx in range(len(weights)):
-            weights[idx] += (self.nn.eta *
-                             adam_w[idx].Compute(dweights[idx]) *
-                             x[idx])
-            biases[idx] += self.nn.eta * adam_b[idx].Compute(
-                dbiases[idx])
+            weights[idx] += self.nn.eta * dweights[idx]
+            biases[idx] += self.nn.eta * dbiases[idx]
+
 
     @staticmethod
-    def _error_func_done(R, qvalue, action_taken):
-        return (R - qvalue) * action_taken
+    def _error_func_done(R, qvalue):
+        return R - qvalue
 
-    def _error_func_not_done(self, R, qvalue, qvalue_next, action_taken):
-        return (R + self.nn.gamma * qvalue_next - qvalue) * action_taken
+    def _error_func_not_done(self, R, qvalue, qvalue_next):
+        return R + self.nn.gamma * qvalue_next - qvalue
 
 
 class DoublePropagationHandler(PropagationHandler):

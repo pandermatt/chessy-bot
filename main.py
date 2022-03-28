@@ -119,7 +119,7 @@ if __name__ == '__main__':
     names = []
     rewards = []
     moves = []
-    N_episodes = 500000
+    N_episodes = 50000
 
     plt.rcParams['figure.figsize'] = [15, 7]
     for agent in [SarsaChessyAgent, QLearningChessyAgent,
