@@ -1,7 +1,8 @@
 # Import
 
 from generate_game import *
-from neuronal_engine.helper import initialize_weights, epsilon_greedy_policy, finished
+from neuronal_engine.helper import initialize_weights, epsilon_greedy_policy, finished, initialize_adam, \
+    initialize_rmsprop
 from neuronal_engine.propagation_handler import PropagationHandler, DoublePropagationHandler
 from util.logger import log
 
@@ -22,19 +23,21 @@ class NeuralNet:
         self.gamma = 0.9  # THE DISCOUNT FACTOR
         self.eta = 0.005  # THE LEARNING RATE
         self.beta_adam = 0.9
+        self.gamma_rmsprop = 0.9
 
         # initialize weights
         self.weights = []
         self.biases = []
 
-        # initialize Adam
-        self.adam_w = []
-        self.adam_b = []
-
         self.prop = PropagationHandler(self)
 
-        initialize_weights(self.layer_sizes, self.weights, self.biases, self.adam_w, self.adam_b, self.beta_adam,
-                           self.xavier)
+        self.weights, self.biases = initialize_weights(self.layer_sizes, self.xavier)
+
+        # initialize Adam
+        self.adam_w, self.adam_b = initialize_adam(self.weights, self.biases, self.beta_adam)
+
+        # initialize RMSProp
+        self.rms_w, self.rms_b = initialize_rmsprop(self.weights, self.biases, self.gamma_rmsprop)
 
     def train(self, N_episodes, callback):
         checkmate_save = np.zeros(N_episodes)

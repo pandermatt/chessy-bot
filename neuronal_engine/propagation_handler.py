@@ -21,10 +21,18 @@ class PropagationHandler:
         return x, h
 
     def backprop(self, x, h, a, R, qvalue, Done, qvalue_next=0):
-        self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next, self.nn.weights, self.nn.biases, self.nn.adam_w,
-                               self.nn.adam_b)
+        self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next)
 
-    def _execute_backprop(self, x, h, a, R, qvalue, Done, qvalue_next, weights, biases, adam_w, adam_b):
+    def _execute_backprop(self, x, h, a, R, qvalue, Done, qvalue_next):
+        weights = self.nn.weights
+        biases = self.nn.biases
+
+        adam_w = self.nn.adam_w
+        adam_b = self.nn.adam_b
+
+        rms_w = self.nn.rms_w
+        rms_b = self.nn.rms_b
+
         dweights = []
         dbiases = []
 
@@ -45,8 +53,14 @@ class PropagationHandler:
                 dbiases[-(idx + 1)] = self.nn.eta * e_n * weights[-1][a, :] * np.heaviside(h[-(idx + 1)], 0)
 
         for idx in range(len(weights)):
-            weights[idx] += self.nn.eta * dweights[idx]
-            biases[idx] += self.nn.eta * dbiases[idx]
+            self.nn.weights[idx] += self.nn.eta * dweights[idx]
+            self.nn.biases[idx] += self.nn.eta * dbiases[idx]
+
+            #self.nn.weights[idx] += self.nn.eta * adam_w[idx].Compute(dweights[idx])
+            #self.nn.biases[idx] += self.nn.eta * adam_b[idx].Compute(dbiases[idx])
+
+            #self.nn.weights[idx] += self.nn.eta * rms_w[idx].Compute(dweights[idx])
+            #self.nn.biases[idx] += self.nn.eta * rms_b[idx].Compute(dbiases[idx])
 
 
     @staticmethod

@@ -44,3 +44,31 @@ class Adam:
         New_grads = mt_n / (np.sqrt(vt_n) + self.epsilon)
 
         return New_grads
+
+
+class RMSProp:
+
+    def __init__(self, Params, gamma):
+        # It finds out if the parameters given are in a vector (N_dim=1) or a matrix (N_dim=2)
+        N_dim = np.shape(np.shape(Params))[0]
+
+        if N_dim == 1:
+            self.N1 = np.shape(Params)[0]
+
+            self.st = np.zeros([self.N1])
+
+        if N_dim == 2:
+            self.N1 = np.shape(Params)[0]
+            self.N2 = np.shape(Params)[1]
+
+            self.st = np.zeros([self.N1, self.N2])
+
+        self.gamma = gamma
+        self.epsilon = 1e-6
+
+    def Compute(self, Grads):
+
+        self.st = self.gamma * self.st + (1 - self.gamma) * Grads ** 2
+        new_grads = np.sqrt(self.st + self.epsilon) * Grads
+
+        return new_grads
