@@ -60,7 +60,7 @@ class NeuralNet:
                 else:
                     a_agent, qvalue = epsilon_greedy_policy(x[-1], a, epsilon_f)
 
-                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent, i)
+                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
 
                 if Done == 1:
                     R_save[n] = np.copy(R)

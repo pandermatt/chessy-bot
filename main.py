@@ -1,5 +1,7 @@
 import numpy as np
 
+from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent, DoubleSARSAChessyAgent, \
+    DoubleQLearningChessyAgent
 from agents.q_table_agent import QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2
 from util.logger import log
 from util.plotting import generate_multi_plot, \
@@ -23,7 +25,9 @@ if __name__ == '__main__':
     moves = []
     N_episodes = 50000
 
-    for agent_class in [QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2]:
+    for agent_class in [SarsaChessyAgent, QLearningChessyAgent,
+                        DoubleSARSAChessyAgent, DoubleQLearningChessyAgent, QTableAgent, QTableAgentCustomReward,
+                        QTableAgentCustomReward2]:
         agent = agent_class(N_episodes)
         model_filename = f"{agent.clean_name()}_model_content"
 
