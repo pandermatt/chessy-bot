@@ -6,7 +6,7 @@ from config import config
 from neuronal_engine.helper import AIM
 
 
-def generate_multi_plot(names, r_saves, step_saves):
+def generate_multi_plot(file_names, names, r_saves, step_saves):
     plt.subplots_adjust(wspace=1, hspace=0.3)
 
     plt.figure()
@@ -19,7 +19,7 @@ def generate_multi_plot(names, r_saves, step_saves):
     plot_curve_avg(names, step_saves, suffix=" -- last 100")
     plot_curve_avg(names, step_saves, last=500, suffix=" -- last 500")
     plt.title(f"Avg. Steps")
-    savefig(f"{'-'.join(names)}-learning_curve-100_500_avg.png")
+    savefig(f"{'-'.join(file_names)}-learning_curve-100_500_avg.png")
 
     plt.figure()
     plt.subplot(2, 1, 1)
@@ -29,7 +29,7 @@ def generate_multi_plot(names, r_saves, step_saves):
     plt.subplot(2, 1, 2)
     plot_curve_avg(names, step_saves, last=500)
     plt.title(f"Avg. Steps -- last 500")
-    savefig(f"{'-'.join(names)}-learning_curve-clean.png")
+    savefig(f"{'-'.join(file_names)}-learning_curve-clean.png")
 
 
 def generate_singe_plot(name, reward, move):
