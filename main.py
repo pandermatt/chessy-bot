@@ -44,7 +44,7 @@ if __name__ == '__main__':
     names = []
     rewards = []
     moves = []
-    N_episodes = 70000
+    N_episodes = 50000
 
     # compare deep nets
     run_for_agents([SarsaChessyAgent,
