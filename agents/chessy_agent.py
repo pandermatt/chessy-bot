@@ -30,20 +30,20 @@ class ChessyAgent(Agent):
 
 
 class SarsaChessyAgent(ChessyAgent):
-    NAME = "SARSA ChessyAgent"
+    NAME = "SARSA"
     NN_KLASS = SarsaNn
 
 
 class QLearningChessyAgent(ChessyAgent):
-    NAME = "Q-learning ChessyAgent"
+    NAME = "Q-learning"
     NN_KLASS = QlearningNn
 
 
 class DoubleQLearningChessyAgent(ChessyAgent):
-    NAME = "Double-Q-learning ChessyAgent"
+    NAME = "Double-Q-learning"
     NN_KLASS = DoubleQlearningNn
 
 
 class DoubleSARSAChessyAgent(ChessyAgent):
-    NAME = "Double-SARSA-learning ChessyAgent"
+    NAME = "Double-SARSA-learning"
     NN_KLASS = DoubleSarsaNn
