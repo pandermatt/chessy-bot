@@ -73,10 +73,10 @@ class DoublePropagationHandler(PropagationHandler):
             else:
                 return self._execute_forwardpass(X, self.nn.weights2, self.nn.biases2)
 
-    def backprop(self, x, a, R, qvalue, Done, qvalue_next=0):
+    def backprop(self, x, h, a, R, qvalue, Done, qvalue_next=0):
         if self.nn.choice:
-            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.nn.weights2, self.nn.biases2,
+            self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next, self.nn.weights2, self.nn.biases2,
                                    self.nn.adam_w2, self.nn.adam_b2)
         else:
-            self._execute_backprop(x, a, R, qvalue, Done, qvalue_next, self.nn.weights, self.nn.biases,
+            self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next, self.nn.weights, self.nn.biases,
                                    self.nn.adam_w, self.nn.adam_b)
