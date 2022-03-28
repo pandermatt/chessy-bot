@@ -4,6 +4,7 @@ import numpy as np
 
 from neuronal_engine.adam import Adam
 
+AIM = 0.99
 
 def epsilon_greedy_policy(Qvalues, a, epsilon):
     if np.random.uniform(0, 1) < epsilon:
@@ -14,6 +15,12 @@ def epsilon_greedy_policy(Qvalues, a, epsilon):
     qvalue = Qvalues[a]
 
     return a, qvalue
+
+
+def finished(reward, n, last=500):
+    if len(reward) <= last:
+        return False
+    return np.mean(reward[(n - last):n]) >= AIM
 
 
 def initialize_weights(layer_sizes, weights, biases, adam_w, adam_b, beta_adam, xavier):

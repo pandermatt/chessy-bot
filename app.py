@@ -5,9 +5,7 @@ import numpy as np
 from flask import Flask, render_template
 from turbo_flask import Turbo
 
-from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent
-from agents.first_five_agent import FirstFiveAgent
-from agents.random_agent import RandomAgent
+from agents.q_table_agent import QTableAgent
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 turbo = Turbo(app)
@@ -44,10 +42,7 @@ def update_load():
                                }
                 turbo.push(turbo.replace(render_template('chess_board.html'), 'load'))
 
-        FirstFiveAgent().run(update_web)
-        RandomAgent().run(update_web)
-        SarsaChessyAgent(60000).run(update_web)
-        QLearningChessyAgent(60000).run(update_web)
+        QTableAgent(300000).run(update_web)
 
 
 def calculate_location(S):
