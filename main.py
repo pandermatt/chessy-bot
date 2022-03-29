@@ -52,6 +52,7 @@ def run_and_compare(agent_class_list):
 
 
 if __name__ == '__main__':
+    np.random.seed(42)
     N_episodes = 500000
 
     # compare activation functions
