@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class Adam:
 
     def __init__(self, Params, beta1):
@@ -25,23 +24,22 @@ class Adam:
         self.beta1 = beta1
         self.beta2 = 0.999
 
-        self.epsilon = 10 ** (-8)
+        self.epsilon = 1e-7
 
         # COUNTER OF THE TRAINING PROCESS
         self.counter = 0
 
-    def Compute(self, Grads):
+    def Compute(self, Grads, lr):
 
-        self.counter = self.counter + 1
+        self.counter += 1
+
+        eta_new = lr * np.sqrt(1 - self.beta2 ** self.counter) / (1 - self.beta1 ** self.counter)
 
         self.mt = self.beta1 * self.mt + (1 - self.beta1) * Grads
 
-        self.vt = self.beta2 * self.vt + (1 - self.beta2) * Grads ** 2
+        self.vt = self.beta2 * self.vt + (1 - self.beta2) * Grads * Grads
 
-        mt_n = self.mt / (1 - self.beta1 ** self.counter)
-        vt_n = self.vt / (1 - self.beta2 ** self.counter)
-
-        New_grads = mt_n / (np.sqrt(vt_n) + self.epsilon)
+        New_grads = eta_new * self.mt / (np.sqrt(self.vt) + self.epsilon)
 
         return New_grads
 
@@ -68,7 +66,7 @@ class RMSProp:
 
     def Compute(self, Grads):
 
-        self.st = self.gamma * self.st + (1 - self.gamma) * Grads ** 2
+        self.st = self.gamma * self.st + (1 - self.gamma) * Grads * Grads
         new_grads = np.sqrt(self.st + self.epsilon) * Grads
 
         return new_grads

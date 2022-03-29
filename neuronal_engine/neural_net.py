@@ -22,7 +22,13 @@ class NeuralNet:
         self.beta = 0.00005
         self.gamma = 0.9  # THE DISCOUNT FACTOR
         self.eta = 0.005  # THE LEARNING RATE
+
+        # params for adam
+        self.adam_eta = 0.01
         self.beta_adam = 0.9
+
+        # params for rmsprop
+        self.rms_eta = 0.1
         self.gamma_rmsprop = 0.9
 
         # initialize weights
