@@ -75,9 +75,10 @@ def generate_singe_plot(name, reward, move):
     plt.close('all')
 
 
-def savefig(filename):
-    plt.xlabel("Epoch")
-    plt.ylabel("Reward")
+def savefig(filename, xlabel="Epoch", ylabel="Reward"):
+    # TODO: FIX AXIS NAME!!!
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
     plt.tight_layout()
     plt.rcParams['figure.figsize'] = [17, 10]
     plt.savefig(config.model_data_file(filename), transparent="True", pad_inches=0)

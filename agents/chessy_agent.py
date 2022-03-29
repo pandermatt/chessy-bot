@@ -56,6 +56,22 @@ class QLearningChessyAgent(ChessyAgent):
     NN_KLASS = QlearningNn
 
 
+class QLearningChessyAgentCustomReward(SarsaChessyAgent):
+    NAME = 'Q-learning with negative reward (-0.1)'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_step=-0.1)
+
+
+class QLearningChessyAgentCustomReward2(SarsaChessyAgent):
+    NAME = 'Q-learning with negative reward (-0.2)'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_step=-0.1)
+
+
 class DoubleQLearningChessyAgent(ChessyAgent):
     NAME = "Double-Q-learning"
     NN_KLASS = DoubleQlearningNn

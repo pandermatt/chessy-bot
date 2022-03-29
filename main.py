@@ -1,8 +1,9 @@
 import numpy as np
 
 from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent, SarsaChessyAgentCustomReward, \
-    DoubleQLearningChessyAgent, DoubleSarsaChessyAgent
-from agents.q_table_agent import QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2
+    SarsaChessyAgentCustomReward2, QLearningChessyAgentCustomReward, \
+    QLearningChessyAgentCustomReward2
+from agents.q_table_agent import QTableAgent
 from util.logger import log
 from util.plotting import generate_multi_plot, \
     generate_singe_plot
@@ -68,3 +69,14 @@ if __name__ == '__main__':
                      SarsaChessyAgentCustomReward,
                      SarsaChessyAgentCustomReward2
                      ])
+
+    run_and_compare([QLearningChessyAgent,
+                     QLearningChessyAgentCustomReward,
+                     QLearningChessyAgentCustomReward2])
+
+    run_and_compare([SarsaChessyAgent,
+                     SarsaChessyAgentCustomReward,
+                     SarsaChessyAgentCustomReward2,
+                     QLearningChessyAgent,
+                     QLearningChessyAgentCustomReward,
+                     QLearningChessyAgentCustomReward2])
