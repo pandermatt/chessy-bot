@@ -65,4 +65,6 @@ if __name__ == '__main__':
                      QTableAgentCustomReward2])
 
     run_and_compare([SarsaChessyAgent,
-                     SarsaChessyAgentCustomReward])
+                     SarsaChessyAgentCustomReward,
+                     SarsaChessyAgentCustomReward2
+                     ])
