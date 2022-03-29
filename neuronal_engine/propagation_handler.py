@@ -48,19 +48,6 @@ class PropagationHandler:
             dweights, dbiases = self.backprop_softmax(x, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken)
 
         for idx in range(len(weights)):
-            if idx == 0:
-                if Done == 1:
-                    e_n = self._error_func_done(R, qvalue) * action_taken
-                else:
-                    e_n = self._error_func_not_done(R, qvalue, qvalue_next) * action_taken
-
-                delta = np.heaviside(h[-1], 0) * e_n
-            else:
-                delta = np.heaviside(h[-(idx+1)], 0) * np.dot(np.transpose(weights[-idx]), delta)
-            dweights[-(idx + 1)] = np.outer(delta, x[-(idx + 2)])
-            dbiases[-(idx + 1)] = delta
-
-        for idx in range(len(weights)):
             if self.nn.optimizer is None:
                 self.nn.weights[idx] += self.nn.eta * dweights[idx] * x[idx]
                 self.nn.biases[idx] += self.nn.eta * dbiases[idx]
