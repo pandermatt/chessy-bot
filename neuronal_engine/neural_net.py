@@ -48,7 +48,7 @@ class NeuralNet:
             a_agent_next, qvalue_next = None, None
 
             callback(self.agent, S, n, N_episodes, R_save, N_moves_save)
-            if finished(R_save, n):
+            if finished(R_save, n, self.env.reward_checkmate):
                 log.info(f'Finished with {n}')
                 callback(self.agent, S, n, N_episodes, R_save, N_moves_save)
                 break

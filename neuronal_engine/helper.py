@@ -18,10 +18,10 @@ def epsilon_greedy_policy(Qvalues, a, epsilon):
     return a, qvalue
 
 
-def finished(reward, n, last=500):
+def finished(reward, n, max, last=500):
     if len(reward) <= last:
         return False
-    return np.mean(reward[(n - last):n]) >= AIM
+    return np.mean(np.divide(reward[(n - last):n], max)) >= AIM
 
 
 def initialize_weights(layer_sizes, xavier):

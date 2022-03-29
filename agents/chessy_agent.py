@@ -93,3 +93,18 @@ class SarsaChessyAgentRMSProp(ChessyAgent):
 class SarsaChessyAgentSoftmax(ChessyAgent):
     NAME = "SARSA Softmax"
     NN_KLASS = SarsaNnSoftmax
+
+
+class SarsaChessyAgentHighReward(SarsaChessyAgent):
+    NAME = 'SARSA with checkmate reward of 5'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_checkmate=5)
+
+class QLearningChessyAgentHighReward(QLearningChessyAgent):
+    NAME = 'Q-learning with checkmate reward of 5'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_checkmate=5)

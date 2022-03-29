@@ -56,7 +56,7 @@ class QTableAgent(Agent):
 
             S, X, allowed_a = self.env.initialise_game()
             callback(self, S, n, N_episodes, R_save, N_moves_save)
-            if finished(R_save, n):
+            if finished(R_save, n, self.env.reward_checkmate):
                 log.info(f'Finished with {n}')
                 callback(self, S, n, N_episodes, R_save, N_moves_save)
                 break

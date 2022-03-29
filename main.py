@@ -1,13 +1,13 @@
 import numpy as np
 
-from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent, SarsaChessyAgentCustomReward, \
-    SarsaChessyAgentCustomReward2, QLearningChessyAgentCustomReward, \
-    QLearningChessyAgentCustomReward2, DoubleSarsaChessyAgent, DoubleQLearningChessyAgent, SarsaChessyAgentAdam, \
-    SarsaChessyAgentRMSProp, SarsaChessyAgentSoftmax
-from agents.q_table_agent import QTableAgent, QTableAgentCustomReward2, QTableAgentCustomReward
+from agents.chessy_agent import SarsaChessyAgentHighReward, QLearningChessyAgentHighReward, SarsaChessyAgent, \
+    SarsaChessyAgentSoftmax, QLearningChessyAgent, DoubleSarsaChessyAgent, DoubleQLearningChessyAgent, \
+    SarsaChessyAgentCustomReward, SarsaChessyAgentCustomReward2, QLearningChessyAgentCustomReward, \
+    QLearningChessyAgentCustomReward2, SarsaChessyAgentAdam, SarsaChessyAgentRMSProp
+from agents.q_table_agent import QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2
 from util.logger import log
 from util.plotting import generate_multi_plot, \
-    generate_singe_plot
+    generate_singe_plot, print_stats
 from util.storage_io import dump_file, load_file, is_model_present
 
 intern_output_nr = 500
@@ -39,6 +39,9 @@ def run_and_compare(agent_class_list):
         log.info(f'Finished with {len(reward)} Epochs')
         log.info(f'Generating plots for: {name}...')
         file_name = agent.clean_name()
+
+        reward = np.divide(reward, agent.env.reward_checkmate)
+        print_stats(name, reward, move)
         generate_singe_plot(file_name, reward, move)
 
         file_names.append(file_name)
@@ -70,20 +73,21 @@ if __name__ == '__main__':
                      QTableAgentCustomReward,
                      QTableAgentCustomReward2])
 
+    # compare negative reward
     run_and_compare([SarsaChessyAgent,
                      SarsaChessyAgentCustomReward,
                      SarsaChessyAgentCustomReward2])
 
+    # compare negative reward
     run_and_compare([QLearningChessyAgent,
                      QLearningChessyAgentCustomReward,
                      QLearningChessyAgentCustomReward2])
 
+    # compare high reward
     run_and_compare([SarsaChessyAgent,
-                     SarsaChessyAgentCustomReward,
-                     SarsaChessyAgentCustomReward2,
+                     SarsaChessyAgentHighReward,
                      QLearningChessyAgent,
-                     QLearningChessyAgentCustomReward,
-                     QLearningChessyAgentCustomReward2])
+                     QLearningChessyAgentHighReward])
 
     # compare optimizers
     run_and_compare([SarsaChessyAgent,

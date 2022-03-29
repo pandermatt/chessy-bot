@@ -7,24 +7,20 @@ from neuronal_engine.helper import AIM
 from util.logger import log
 
 
-def print_stats(names, r_saves, step_saves):
-    for idx in range(len(names)):
-        log.info('------------------------')
-        log.info(names[idx])
-        log.info(f"Average reward: {np.mean(r_saves[idx])}")
-        log.info(f"Number of steps: {np.mean(step_saves[idx])}")
-        # WARNING: THIS LINE WORKS ONLY IF REWARD IS = 1 FOR WIN
-        log.info(f"Checkmates: {r_saves[idx].count(1)}")
-        log.info(f"Checkmate/Ration: {r_saves[idx].count(1) / len(r_saves[idx])}")
-        log.info(f"Amount of epoch's needed: {len(r_saves[idx])}")
-        log.info(f"--> LAST 100: Average reward: {np.mean(r_saves[idx][-100:])}")
-        log.info(f"--> LAST 100: Number of steps: {np.mean(step_saves[idx][-100:])}")
-        log.info(f"--> LAST 100: Checkmates: {r_saves[idx][-100:].count(1)}")
+def print_stats(name, r_save, step_save):
+    log.info('------------------------')
+    log.info(name)
+    log.info(f"Average reward: {np.mean(r_save)}")
+    log.info(f"Number of steps: {np.mean(step_save)}")
+    log.info(f"Checkmates: {(r_save == 1).sum()}")
+    log.info(f"Checkmate/Ration: {(r_save == 1).sum() / len(r_save)}")
+    log.info(f"Amount of epoch's needed: {len(r_save)}")
+    log.info(f"--> LAST 100: Average reward: {np.mean(r_save[-100:])}")
+    log.info(f"--> LAST 100: Number of steps: {np.mean(step_save[-100:])}")
+    log.info(f"--> LAST 100: Checkmates: {(r_save[-100:] == 1).sum()}")
 
 
 def generate_multi_plot(file_names, names, r_saves, step_saves):
-    print_stats(names, r_saves, step_saves)
-
     plt.subplots_adjust(wspace=1, hspace=0.3)
 
     plt.figure()
@@ -48,6 +44,16 @@ def generate_multi_plot(file_names, names, r_saves, step_saves):
     plot_curve_avg(names, step_saves, last=500)
     plt.title(f"Avg. Steps -- last 500")
     savefig(f"multi-plot-{'-'.join(file_names)}-learning_curve-clean.png")
+
+    plt.figure()
+    plt.subplot(2, 1, 1)
+    plot_curve_avg(names, r_saves, last=1000)
+    plt.title(f"Avg. Rewards -- last 1000")
+
+    plt.subplot(2, 1, 2)
+    plot_curve_avg(names, step_saves, last=1000)
+    plt.title(f"Avg. Steps -- last 1000")
+    savefig(f"multi-plot-{'-'.join(file_names)}-learning_curve-super-clean.png")
 
     plt.figure()
     x = {}
