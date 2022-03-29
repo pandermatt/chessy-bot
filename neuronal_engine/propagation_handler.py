@@ -53,14 +53,14 @@ class PropagationHandler:
                 dbiases[-(idx + 1)] = self.nn.eta * e_n * weights[-1][a, :] * np.heaviside(h[-(idx + 1)], 0)
 
         for idx in range(len(weights)):
-            self.nn.weights[idx] += self.nn.eta * dweights[idx]
-            self.nn.biases[idx] += self.nn.eta * dbiases[idx]
+            #self.nn.weights[idx] += self.nn.eta * dweights[idx]
+            #self.nn.biases[idx] += self.nn.eta * dbiases[idx]
 
-            #self.nn.weights[idx] += self.nn.eta * adam_w[idx].Compute(dweights[idx])
-            #self.nn.biases[idx] += self.nn.eta * adam_b[idx].Compute(dbiases[idx])
+            #self.nn.weights[idx] += adam_w[idx].Compute(dweights[idx], self.nn.adam_eta)
+            #self.nn.biases[idx] += adam_b[idx].Compute(dbiases[idx], self.nn.adam_eta)
 
-            #self.nn.weights[idx] += self.nn.eta * rms_w[idx].Compute(dweights[idx])
-            #self.nn.biases[idx] += self.nn.eta * rms_b[idx].Compute(dbiases[idx])
+            self.nn.weights[idx] += self.nn.rms_eta * rms_w[idx].Compute(dweights[idx])
+            self.nn.biases[idx] += self.nn.rms_eta * rms_b[idx].Compute(dbiases[idx])
 
 
     @staticmethod
