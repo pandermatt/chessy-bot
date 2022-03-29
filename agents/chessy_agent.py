@@ -2,7 +2,8 @@ import numpy as np
 
 from agents.agent import Agent
 from chess_env import ChessEnv
-from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, DoubleSarsaNn, NeuralNet
+from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, DoubleSarsaNn, NeuralNet, SarsaNnAdam, \
+    SarsaNnRMSProp
 
 
 class ChessyAgent(Agent):
@@ -80,3 +81,11 @@ class DoubleQLearningChessyAgent(ChessyAgent):
 class DoubleSarsaChessyAgent(ChessyAgent):
     NAME = "Double-SARSA-learning"
     NN_KLASS = DoubleSarsaNn
+
+class SarsaChessyAgentAdam(ChessyAgent):
+    NAME = "SARSA Adam"
+    NN_KLASS = SarsaNnAdam
+
+class SarsaChessyAgentRMSProp(ChessyAgent):
+    NAME = "SARSA RMSProp"
+    NN_KLASS = SarsaNnRMSProp

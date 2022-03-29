@@ -17,19 +17,12 @@ class NeuralNet:
         self.env = agent.env
         self.layer_sizes = agent._get_layer_sizes()
         self.xavier = xavier
+        self.optimizer = None
         self.epsilon_0 = 0.25  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
         # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
         self.beta = 0.00005
         self.gamma = 0.9  # THE DISCOUNT FACTOR
         self.eta = 0.005  # THE LEARNING RATE
-
-        # params for adam
-        self.adam_eta = 0.01
-        self.beta_adam = 0.9
-
-        # params for rmsprop
-        self.rms_eta = 0.1
-        self.gamma_rmsprop = 0.9
 
         # initialize weights
         self.weights = []
@@ -39,11 +32,6 @@ class NeuralNet:
 
         self.weights, self.biases = initialize_weights(self.layer_sizes, self.xavier)
 
-        # initialize Adam
-        self.adam_w, self.adam_b = initialize_adam(self.weights, self.biases, self.beta_adam)
-
-        # initialize RMSProp
-        self.rms_w, self.rms_b = initialize_rmsprop(self.weights, self.biases, self.gamma_rmsprop)
 
     def train(self, N_episodes, callback):
         checkmate_save = np.zeros(N_episodes)
@@ -119,17 +107,40 @@ class DoubleQlearningNn(NeuralNet):
         super().__init__(*args, **kwargs)
         self.weights2 = []
         self.biases2 = []
-        self.adam_w2 = []
-        self.adam_b2 = []
 
         self.choice = 0
         self.counter = 0
 
         self.prop = DoublePropagationHandler(self)
 
-        initialize_weights(self.layer_sizes, self.weights2, self.biases2, self.adam_w2, self.adam_b2, self.beta_adam,
-                           self.xavier)
+        self.weights2, self.biases2 = initialize_weights(self.layer_sizes, self.xavier)
 
 
 class DoubleSarsaNn(DoubleQlearningNn):
     type = SARSA
+
+
+class SarsaNnAdam(SarsaNn):
+    type = SARSA
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.optimizer = 'adam'
+        # params for adam
+        self.adam_eta = 0.01
+        self.beta_adam = 0.9
+        # initialize Adam
+        self.adam_w, self.adam_b = initialize_adam(self.weights, self.biases, self.beta_adam)
+
+
+class SarsaNnRMSProp(SarsaNn):
+    type = SARSA
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.optimizer = 'rmsprop'
+        # params for rmsprop
+        self.rms_eta = 0.1
+        self.gamma_rmsprop = 0.9
+        # initialize RMSProp
+        self.rms_w, self.rms_b = initialize_rmsprop(self.weights, self.biases, self.gamma_rmsprop)
