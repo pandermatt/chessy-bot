@@ -53,7 +53,7 @@ def run_and_compare(agent_class_list):
 
 if __name__ == '__main__':
     np.random.seed(42)
-    N_episodes = 500000
+    N_episodes = 300000
 
     # compare activation functions
     run_and_compare([SarsaChessyAgent,
