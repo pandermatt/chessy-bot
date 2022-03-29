@@ -20,6 +20,7 @@ class NeuralNet:
         self.optimizer = None
         self.activation = 'relu'
         self.epsilon_0 = 0.25  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
+        self.leaky_constant = 0.1
         # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
         self.beta = 0.00005
         self.gamma = 0.9  # THE DISCOUNT FACTOR
@@ -147,10 +148,19 @@ class SarsaNnRMSProp(SarsaNn):
         self.rms_w, self.rms_b = initialize_rmsprop(self.weights, self.biases, self.gamma_rmsprop)
 
 
-class SarsaNnSoftmax(SarsaNn):
+class SarsaNnSigmoid(SarsaNn):
     type = SARSA
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.activation = 'softmax'
+        self.activation = 'sigmoid'
+
+
+class SarsaNnLeakyReLU(SarsaNn):
+    type = SARSA
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.activation = 'leakyrelu'
+
 

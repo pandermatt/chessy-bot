@@ -1,9 +1,9 @@
 import numpy as np
 
 from agents.chessy_agent import SarsaChessyAgentHighReward, QLearningChessyAgentHighReward, SarsaChessyAgent, \
-    SarsaChessyAgentSoftmax, QLearningChessyAgent, DoubleSarsaChessyAgent, DoubleQLearningChessyAgent, \
+    SarsaChessyAgentSigmoid, QLearningChessyAgent, DoubleSarsaChessyAgent, DoubleQLearningChessyAgent, \
     SarsaChessyAgentCustomReward, SarsaChessyAgentCustomReward2, QLearningChessyAgentCustomReward, \
-    QLearningChessyAgentCustomReward2, SarsaChessyAgentAdam, SarsaChessyAgentRMSProp
+    QLearningChessyAgentCustomReward2, SarsaChessyAgentAdam, SarsaChessyAgentRMSProp, SarsaChessyAgentLeakyReLU
 from agents.q_table_agent import QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2
 from util.logger import log
 from util.plotting import generate_multi_plot, \
@@ -57,7 +57,8 @@ if __name__ == '__main__':
 
     # compare activation functions
     run_and_compare([SarsaChessyAgent,
-                     SarsaChessyAgentSoftmax])
+                     SarsaChessyAgentSigmoid,
+                     SarsaChessyAgentLeakyReLU])
 
     # compare deep nets
     run_and_compare([SarsaChessyAgent,
