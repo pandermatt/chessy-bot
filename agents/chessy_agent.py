@@ -36,11 +36,19 @@ class SarsaChessyAgent(ChessyAgent):
 
 
 class SarsaChessyAgentCustomReward(SarsaChessyAgent):
-    NAME = 'SARSA with negative reward'
+    NAME = 'SARSA with negative reward (-0.1)'
 
     def __init__(self, N_episodes):
         super().__init__(N_episodes)
-        self.env = ChessEnv(4, reward_step=-0.1, reward_draw=0, reward_checkmate=1)
+        self.env = ChessEnv(4, reward_step=-0.1)
+
+
+class SarsaChessyAgentCustomReward2(SarsaChessyAgent):
+    NAME = 'SARSA with negative reward (-0.2)'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_step=-0.1)
 
 
 class QLearningChessyAgent(ChessyAgent):
