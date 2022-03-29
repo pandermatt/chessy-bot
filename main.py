@@ -3,7 +3,7 @@ import numpy as np
 from agents.chessy_agent import SarsaChessyAgent, QLearningChessyAgent, SarsaChessyAgentCustomReward, \
     SarsaChessyAgentCustomReward2, QLearningChessyAgentCustomReward, \
     QLearningChessyAgentCustomReward2, DoubleSarsaChessyAgent, DoubleQLearningChessyAgent, SarsaChessyAgentAdam, \
-    SarsaChessyAgentRMSProp
+    SarsaChessyAgentRMSProp, SarsaChessyAgentSoftmax
 from agents.q_table_agent import QTableAgent, QTableAgentCustomReward2, QTableAgentCustomReward
 from util.logger import log
 from util.plotting import generate_multi_plot, \
@@ -50,6 +50,10 @@ def run_and_compare(agent_class_list):
 
 if __name__ == '__main__':
     N_episodes = 500000
+
+    # compare activation functions
+    run_and_compare([SarsaChessyAgent,
+                     SarsaChessyAgentSoftmax])
 
     # compare deep nets
     run_and_compare([SarsaChessyAgent,

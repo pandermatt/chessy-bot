@@ -3,7 +3,7 @@ import numpy as np
 from agents.agent import Agent
 from chess_env import ChessEnv
 from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, DoubleSarsaNn, NeuralNet, SarsaNnAdam, \
-    SarsaNnRMSProp
+    SarsaNnRMSProp, SarsaNnSoftmax
 
 
 class ChessyAgent(Agent):
@@ -89,3 +89,7 @@ class SarsaChessyAgentAdam(ChessyAgent):
 class SarsaChessyAgentRMSProp(ChessyAgent):
     NAME = "SARSA RMSProp"
     NN_KLASS = SarsaNnRMSProp
+
+class SarsaChessyAgentSoftmax(ChessyAgent):
+    NAME = "SARSA Softmax"
+    NN_KLASS = SarsaNnSoftmax

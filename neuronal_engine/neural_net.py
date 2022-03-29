@@ -18,6 +18,7 @@ class NeuralNet:
         self.layer_sizes = agent._get_layer_sizes()
         self.xavier = xavier
         self.optimizer = None
+        self.activation = 'relu'
         self.epsilon_0 = 0.25  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
         # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
         self.beta = 0.00005
@@ -144,3 +145,12 @@ class SarsaNnRMSProp(SarsaNn):
         self.gamma_rmsprop = 0.9
         # initialize RMSProp
         self.rms_w, self.rms_b = initialize_rmsprop(self.weights, self.biases, self.gamma_rmsprop)
+
+
+class SarsaNnSoftmax(SarsaNn):
+    type = SARSA
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.activation = 'softmax'
+
