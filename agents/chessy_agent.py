@@ -3,7 +3,7 @@ import numpy as np
 from agents.agent import Agent
 from chess_env import ChessEnv
 from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, DoubleSarsaNn, NeuralNet, SarsaNnAdam, \
-    SarsaNnRMSProp, SarsaNnSoftmax
+    SarsaNnRMSProp, SarsaNnSigmoid, SarsaNnLeakyReLU
 
 
 class ChessyAgent(Agent):
@@ -82,17 +82,20 @@ class DoubleSarsaChessyAgent(ChessyAgent):
     NAME = "Double-SARSA-learning"
     NN_KLASS = DoubleSarsaNn
 
+
 class SarsaChessyAgentAdam(ChessyAgent):
     NAME = "SARSA Adam"
     NN_KLASS = SarsaNnAdam
+
 
 class SarsaChessyAgentRMSProp(ChessyAgent):
     NAME = "SARSA RMSProp"
     NN_KLASS = SarsaNnRMSProp
 
-class SarsaChessyAgentSoftmax(ChessyAgent):
-    NAME = "SARSA Softmax"
-    NN_KLASS = SarsaNnSoftmax
+
+class SarsaChessyAgentSigmoid(ChessyAgent):
+    NAME = "SARSA Sigmoid"
+    NN_KLASS = SarsaNnSigmoid
 
 
 class SarsaChessyAgentHighReward(SarsaChessyAgent):
@@ -102,9 +105,15 @@ class SarsaChessyAgentHighReward(SarsaChessyAgent):
         super().__init__(N_episodes)
         self.env = ChessEnv(4, reward_checkmate=5)
 
+
 class QLearningChessyAgentHighReward(QLearningChessyAgent):
     NAME = 'Q-learning with checkmate reward of 5'
 
     def __init__(self, N_episodes):
         super().__init__(N_episodes)
         self.env = ChessEnv(4, reward_checkmate=5)
+
+
+class SarsaChessyAgentLeakyReLU(ChessyAgent):
+    NAME = "SARSA LeakyReLU"
+    NN_KLASS = SarsaNnLeakyReLU

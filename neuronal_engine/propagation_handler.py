@@ -17,10 +17,13 @@ class PropagationHandler:
             h.append(np.dot(weights[idx], x[-1]) + biases[idx])
 
             if self.nn.activation == 'relu':
-                x.append(np.maximum(0.1*h[-1], h[-1]))
+                x.append(np.maximum(0, h[-1]))
 
-            elif self.nn.activation == 'softmax':
+            elif self.nn.activation == 'sigmoid':
                 x.append(1/(1+np.exp(-h[-1])))
+
+            elif self.nn.activation == 'leakyrelu':
+                x.append(np.maximum(self.nn.leaky_constant*h[-1], h[-1]))
 
         return x, h
 
@@ -44,8 +47,11 @@ class PropagationHandler:
         if self.nn.activation == 'relu':
             dweights, dbiases = self.backprop_relu(x, h, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken)
 
-        elif self.nn.activation == 'softmax':
-            dweights, dbiases = self.backprop_softmax(x, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken)
+        elif self.nn.activation == 'sigmoid':
+            dweights, dbiases = self.backprop_sigmoid(x, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken)
+
+        elif self.nn.activation == 'leakyrelu':
+            dweights, dbiases = self.backprop_leakyrelu(x, h, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken)
 
         for idx in range(len(weights)):
             if self.nn.optimizer is None:
@@ -76,7 +82,7 @@ class PropagationHandler:
 
         return dweights, dbiases
 
-    def backprop_softmax(self, x, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken):
+    def backprop_sigmoid(self, x, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken):
         for idx in range(len(weights)):
             if idx == 0:
                 if Done == 1:
@@ -89,6 +95,28 @@ class PropagationHandler:
                 delta = (x[-(idx + 1)] * (1 - x[-(idx + 1)]) * np.dot(np.transpose(weights[-idx]), delta))
             dweights[-(idx + 1)] += np.outer(delta, x[-(idx + 2)])
             dbiases[-(idx + 1)] += delta
+
+        return dweights, dbiases
+
+    def backprop_leakyrelu(self, x, h, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken):
+        dh = []
+        for _h in h:
+            dh_next = np.ones_like(_h)
+            dh_next[_h < 0] = self.nn.leaky_constant
+            dh.append(dh_next)
+
+        for idx in range(len(weights)):
+            if idx == 0:
+                if Done == 1:
+                    e_n = self._error_func_done(R, qvalue) * action_taken
+                else:
+                    e_n = self._error_func_not_done(R, qvalue, qvalue_next) * action_taken
+
+                delta = dh[-1] * e_n
+            else:
+                delta = dh[-(idx+1)] * np.dot(np.transpose(weights[-idx]), delta)
+            dweights[-(idx + 1)] = np.outer(delta, x[-(idx + 2)])
+            dbiases[-(idx + 1)] = delta
 
         return dweights, dbiases
 
