@@ -87,7 +87,7 @@ class NeuralNet:
 
                 move_counter += 1
             else:
-                log.error(f"Invalid Epoche. Epoche was longer than {MAX_STEPS_ALLOWED}")
+                log.error(f"Invalid Episode. Episode was longer than {MAX_STEPS_ALLOWED}")
 
         log.info(f"{self.agent.NAME}, Average reward: {np.mean(R_save)}")
         log.info(f"Number of steps: {np.mean(N_moves_save)}")
@@ -165,7 +165,7 @@ class SarsaNnLeakyReLU(SarsaNn):
         self.activation = 'leakyrelu'
 
 
-class QLearningNnLeakyReLU(SarsaNn):
+class QLearningNnLeakyReLU(QlearningNn):
     type = QLEARNING
 
     def __init__(self, *args, **kwargs):
@@ -173,7 +173,7 @@ class QLearningNnLeakyReLU(SarsaNn):
         self.activation = 'leakyrelu'
 
 
-class QlearningNnRMSProp(SarsaNn):
+class QlearningNnRMSProp(QlearningNn):
     type = QLEARNING
 
     def __init__(self, *args, **kwargs):
@@ -186,7 +186,7 @@ class QlearningNnRMSProp(SarsaNn):
         self.rms_w, self.rms_b = initialize_rmsprop(self.weights, self.biases, self.gamma_rmsprop)
 
 
-class QlearningNnRMSPropLeakyReLU(SarsaNn):
+class QlearningNnRMSPropLeakyReLU(QlearningNn):
     type = QLEARNING
 
     def __init__(self, *args, **kwargs):
@@ -199,3 +199,15 @@ class QlearningNnRMSPropLeakyReLU(SarsaNn):
         self.gamma_rmsprop = 0.9
         # initialize RMSProp
         self.rms_w, self.rms_b = initialize_rmsprop(self.weights, self.biases, self.gamma_rmsprop)
+
+
+class SarsaNnCustomValues(SarsaNn):
+    type = SARSA
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def set_custom_values(self, beta=0.00005, gamma=0.0, eta=0.005):
+        self.beta = beta
+        self.gamma = gamma
+        self.eta = eta

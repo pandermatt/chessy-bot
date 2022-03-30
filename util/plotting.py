@@ -14,7 +14,7 @@ def print_stats(name, r_save, step_save):
     log.info(f"Number of steps: {np.mean(step_save)}")
     log.info(f"Checkmates: {(r_save == 1).sum()}")
     log.info(f"Checkmate/Ration: {(r_save == 1).sum() / len(r_save)}")
-    log.info(f"Amount of epoch's needed: {len(r_save)}")
+    log.info(f"Amount of episode's needed: {len(r_save)}")
     log.info(f"--> LAST 100: Average reward: {np.mean(r_save[-100:])}")
     log.info(f"--> LAST 100: Number of steps: {np.mean(step_save[-100:])}")
     log.info(f"--> LAST 100: Checkmates: {(r_save[-100:] == 1).sum()}")
@@ -135,7 +135,7 @@ def evaluate_agent(name, reward):
     savefig(f"{name}-learning_curve_clean.png")
 
 
-def fig_setup(ylabel, xlabel='Epoch'):
+def fig_setup(ylabel, xlabel='Episode'):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.grid(True)

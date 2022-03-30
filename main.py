@@ -18,7 +18,7 @@ intern_output_nr = 500
 def print_to_console(agent, _, n, N_episodes, R_save, N_moves_save):
     if n % intern_output_nr == 0 and n > 0:
         dump_file(agent, agent.clean_name())
-        log.info(f"Epoche ({n}/{N_episodes})")
+        log.info(f"Episode ({n}/{N_episodes})")
         log.info(f"{agent.NAME}, Average reward: {np.mean(R_save[(n - intern_output_nr):n])} "
                  + f"Number of steps: {np.mean(N_moves_save[(n - intern_output_nr):n])}")
 
@@ -43,7 +43,7 @@ def run_and_compare(agent_class_list):
             dump_file([name, reward, move], model_filename)
 
         name = agent.NAME
-        log.info(f'Finished with {len(reward)} Epochs')
+        log.info(f'Finished with {len(reward)} Episodes')
         log.info(f'Generating plots for: {name}...')
         file_name = agent.clean_name()
 

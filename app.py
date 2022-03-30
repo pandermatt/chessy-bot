@@ -10,7 +10,7 @@ from agents.chessy_agent import SarsaChessyAgent
 app = Flask(__name__, static_folder='static', static_url_path='')
 turbo = Turbo(app)
 
-app_content = {'board': {'error': "No State yet"}, 'done': 0, 'info_text': f"Epoche (NOT STARTED YET)"}
+app_content = {'board': {'error': "No State yet"}, 'done': 0, 'info_text': f"Episode (NOT STARTED YET)"}
 
 
 @app.context_processor
@@ -34,7 +34,7 @@ def update_load():
             if n % 10 == 0:
                 global app_content
                 app_content = {'board': calculate_location(S),
-                               'epoche_string': f"{n}/{N_episodes}",
+                               'episode_string': f"{n}/{N_episodes}",
                                'average_reward': np.mean(R_save[(n - 100):n]),
                                'num_of_steps': np.mean(N_moves_save[(n - 100):n]),
                                'percentage': f"{n / N_episodes * 100}%",
