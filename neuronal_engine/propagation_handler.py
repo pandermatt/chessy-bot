@@ -28,12 +28,9 @@ class PropagationHandler:
         return x, h
 
     def backprop(self, x, h, a, R, qvalue, Done, qvalue_next=0):
-        self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next)
+        self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next, self.nn.weights, self.nn.biases)
 
-    def _execute_backprop(self, x, h, a, R, qvalue, Done, qvalue_next):
-        weights = self.nn.weights
-        biases = self.nn.biases
-
+    def _execute_backprop(self, x, h, a, R, qvalue, Done, qvalue_next, weights, biases):
         dweights = []
         dbiases = []
 
@@ -55,16 +52,16 @@ class PropagationHandler:
 
         for idx in range(len(weights)):
             if self.nn.optimizer is None:
-                self.nn.weights[idx] += self.nn.eta * dweights[idx] * x[idx]
-                self.nn.biases[idx] += self.nn.eta * dbiases[idx]
+                weights[idx] += self.nn.eta * dweights[idx] * x[idx]
+                biases[idx] += self.nn.eta * dbiases[idx]
 
             elif self.nn.optimizer == 'adam':
-                self.nn.weights[idx] += self.nn.adam_w[idx].Compute(dweights[idx], self.nn.adam_eta)
-                self.nn.biases[idx] += self.nn.adam_b[idx].Compute(dbiases[idx], self.nn.adam_eta)
+                weights[idx] += self.nn.adam_w[idx].Compute(dweights[idx], self.nn.adam_eta)
+                biases[idx] += self.nn.adam_b[idx].Compute(dbiases[idx], self.nn.adam_eta)
 
             elif self.nn.optimizer == 'rmsprop':
-                self.nn.weights[idx] += self.nn.rms_eta * self.nn.rms_w[idx].Compute(dweights[idx])
-                self.nn.biases[idx] += self.nn.rms_eta * self.nn.rms_b[idx].Compute(dbiases[idx])
+                weights[idx] += self.nn.rms_eta * self.nn.rms_w[idx].Compute(dweights[idx])
+                biases[idx] += self.nn.rms_eta * self.nn.rms_b[idx].Compute(dbiases[idx])
 
     def backprop_relu(self, x, h, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken):
         for idx in range(len(weights)):
@@ -146,6 +143,6 @@ class DoublePropagationHandler(PropagationHandler):
 
     def backprop(self, x, h, a, R, qvalue, Done, qvalue_next=0):
         if self.nn.choice:
-            self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next)
+            self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next, self.nn.weights2, self.nn.biases2)
         else:
-            self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next)
+            self._execute_backprop(x, h, a, R, qvalue, Done, qvalue_next, self.nn.weights, self.nn.biases)
