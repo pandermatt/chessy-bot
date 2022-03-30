@@ -1,11 +1,12 @@
 import numpy as np
 
-from agents.chessy_agent import SarsaChessyAgentHighReward, QLearningChessyAgentHighReward, SarsaChessyAgent, \
-    SarsaChessyAgentSigmoid, QLearningChessyAgent, DoubleSarsaChessyAgent, DoubleQLearningChessyAgent, \
-    SarsaChessyAgentCustomReward, SarsaChessyAgentCustomReward2, QLearningChessyAgentCustomReward, \
-    QLearningChessyAgentCustomReward2, SarsaChessyAgentAdam, SarsaChessyAgentRMSProp, SarsaChessyAgentLeakyReLU, \
-    SarsaChessyAgentOneHiddens
-from agents.q_table_agent import QTableAgent, QTableAgentCustomReward, QTableAgentCustomReward2
+from agents.chessy_agent import QLearningChessyAgent, QLearningChessyAgentLeakyReLU, \
+    QLearningChessyAgentRMSProp, QLearningChessyAgentRMSPropLeakyReLU, SarsaChessyAgentOneHidden, SarsaChessyAgent, \
+    SarsaChessyAgentThreeHidden, SarsaChessyAgentAdam, SarsaChessyAgentRMSProp, QLearningChessyAgentHighReward, \
+    SarsaChessyAgentHighReward, QLearningChessyAgentCustomReward, QLearningChessyAgentCustomReward2, \
+    SarsaChessyAgentCustomReward, SarsaChessyAgentCustomReward2, DoubleQLearningChessyAgent, DoubleSarsaChessyAgent, \
+    SarsaChessyAgentSigmoid, SarsaChessyAgentLeakyReLU
+from agents.q_table_agent import QTableAgent, QTableAgentCustomReward2, QTableAgentCustomReward
 from util.logger import log
 from util.plotting import generate_multi_plot, \
     generate_singe_plot, print_stats
@@ -98,3 +99,11 @@ if __name__ == '__main__':
     run_and_compare([SarsaChessyAgent,
                      SarsaChessyAgentAdam,
                      SarsaChessyAgentRMSProp])
+
+    # compare hidden layer_sizes
+    run_and_compare([SarsaChessyAgentOneHidden, SarsaChessyAgent, SarsaChessyAgentThreeHidden])
+
+    run_and_compare([QLearningChessyAgent,
+                     QLearningChessyAgentLeakyReLU,
+                     QLearningChessyAgentRMSProp,
+                     QLearningChessyAgentRMSPropLeakyReLU])

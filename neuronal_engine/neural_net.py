@@ -163,3 +163,39 @@ class SarsaNnLeakyReLU(SarsaNn):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.activation = 'leakyrelu'
+
+
+class QLearningNnLeakyReLU(SarsaNn):
+    type = QLEARNING
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.activation = 'leakyrelu'
+
+
+class QlearningNnRMSProp(SarsaNn):
+    type = QLEARNING
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.optimizer = 'rmsprop'
+        # params for rmsprop
+        self.rms_eta = 0.1
+        self.gamma_rmsprop = 0.9
+        # initialize RMSProp
+        self.rms_w, self.rms_b = initialize_rmsprop(self.weights, self.biases, self.gamma_rmsprop)
+
+
+class QlearningNnRMSPropLeakyReLU(SarsaNn):
+    type = QLEARNING
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.activation = 'leakyrelu'
+
+        self.optimizer = 'rmsprop'
+        # params for rmsprop
+        self.rms_eta = 0.1
+        self.gamma_rmsprop = 0.9
+        # initialize RMSProp
+        self.rms_w, self.rms_b = initialize_rmsprop(self.weights, self.biases, self.gamma_rmsprop)

@@ -3,7 +3,8 @@ import numpy as np
 from agents.agent import Agent
 from chess_env import ChessEnv
 from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, DoubleSarsaNn, NeuralNet, SarsaNnAdam, \
-    SarsaNnRMSProp, SarsaNnSigmoid, SarsaNnLeakyReLU
+    SarsaNnRMSProp, SarsaNnSigmoid, SarsaNnLeakyReLU, QLearningNnLeakyReLU, QlearningNnRMSProp, \
+    QlearningNnRMSPropLeakyReLU
 
 
 class ChessyAgent(Agent):
@@ -36,7 +37,9 @@ class SarsaChessyAgent(ChessyAgent):
     NN_KLASS = SarsaNn
 
 
-class SarsaChessyAgentOneHiddens(SarsaChessyAgent):
+class SarsaChessyAgentOneHidden(SarsaChessyAgent):
+    NAME = "SARSA with one hidden layer"
+
     def _get_layer_sizes(self):
         board_state, X, allowed_actions = self.env.initialise_game()
         N_a = np.shape(allowed_actions)[0]
@@ -44,6 +47,16 @@ class SarsaChessyAgentOneHiddens(SarsaChessyAgent):
         N_h1 = 200
 
         return [N_in, N_h1, N_a]
+
+
+class SarsaChessyAgentThreeHidden(SarsaChessyAgent):
+    NAME = "SARSA with three hidden layer (200 - 100 - 200)"
+
+    def _get_layer_sizes(self):
+        board_state, X, allowed_actions = self.env.initialise_game()
+        N_a = np.shape(allowed_actions)[0]
+        N_in = np.shape(X)[0]
+        return [N_in, 200, 100, 200, N_a]
 
 
 class SarsaChessyAgentCustomReward(SarsaChessyAgent):
@@ -65,6 +78,21 @@ class SarsaChessyAgentCustomReward2(SarsaChessyAgent):
 class QLearningChessyAgent(ChessyAgent):
     NAME = "Q-learning"
     NN_KLASS = QlearningNn
+
+
+class QLearningChessyAgentLeakyReLU(ChessyAgent):
+    NAME = "Q-learning Leaky ReLU"
+    NN_KLASS = QLearningNnLeakyReLU
+
+
+class QLearningChessyAgentRMSProp(ChessyAgent):
+    NAME = "Q-learning RMSProp"
+    NN_KLASS = QlearningNnRMSProp
+
+
+class QLearningChessyAgentRMSPropLeakyReLU(ChessyAgent):
+    NAME = "Q-learning RMSProp & Leaky ReLU"
+    NN_KLASS = QlearningNnRMSPropLeakyReLU
 
 
 class QLearningChessyAgentCustomReward(SarsaChessyAgent):
