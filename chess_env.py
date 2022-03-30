@@ -4,11 +4,12 @@ from generate_game import *
 
 class ChessEnv:
 
-    def __init__(self, n_grid, reward_step=0, reward_draw=0, reward_checkmate=1):
+    def __init__(self, n_grid, reward_step=0, reward_draw=0, reward_checkmate=1, reward_too_many_steps=0):
 
         self.reward_step = reward_step
         self.reward_draw = reward_draw
         self.reward_checkmate = reward_checkmate
+        self.reward_too_many_steps = reward_too_many_steps
 
         self.N_grid = n_grid  # SIZE OF THE BOARD
 
@@ -109,7 +110,7 @@ class ChessEnv:
 
         return self.Board, X, allowed_a
 
-    def one_step(self, agent_action):
+    def one_step(self, agent_action, should_end_game=False):
         """
         OneStep. The method performs a one step update of the system. Given as input the action selected by the agent,
         it updates the chess board by performing that action and the response of the enemy king (which is a random allowed
@@ -192,6 +193,12 @@ class ChessEnv:
             R = self.reward_draw  # Reward for draw
             allowed_a = []  # Allowed_a set to nothing (end of the episode)
             X = []  # Features set to nothing (end of the episode)
+
+        elif should_end_game:
+            Done = 1
+            R = self.reward_too_many_steps
+            allowed_a = []
+            X = []
 
         # THE GAME CONTINUES
         else:

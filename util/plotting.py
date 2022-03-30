@@ -25,53 +25,63 @@ def generate_multi_plot(file_names, names, r_saves, step_saves):
 
     plt.figure()
     plt.subplot(2, 1, 1)
-    plot_curve_avg(names, r_saves, suffix=" -- last 100")
-    plot_curve_avg(names, r_saves, last=500, suffix=" -- last 500")
-    plt.title(f"Avg. Rewards")
+    plot_curve_avg(names, r_saves, suffix=" $-$ last 100")
+    plot_curve_avg(names, r_saves, last=500, suffix=" $-$ last 500")
+    fig_setup('Checkmate')
+    plt.title(f"Avg. Checkmates")
 
     plt.subplot(2, 1, 2)
-    plot_curve_avg(names, step_saves, suffix=" -- last 100")
-    plot_curve_avg(names, step_saves, last=500, suffix=" -- last 500")
+    plot_curve_avg(names, step_saves, suffix=" $-$ last 100")
+    plot_curve_avg(names, step_saves, last=500, suffix=" $-$ last 500")
+    fig_setup('Step')
     plt.title(f"Avg. Steps")
     savefig(f"multi-plot-{'-'.join(file_names)}-learning_curve-100_500_avg.png")
 
     plt.figure()
     plt.subplot(2, 1, 1)
     plot_curve_avg(names, r_saves, last=500)
-    plt.title(f"Avg. Rewards -- last 500")
+    fig_setup('Checkmate')
+    plt.title(f"Avg. Checkmates $-$ last 500")
 
     plt.subplot(2, 1, 2)
     plot_curve_avg(names, step_saves, last=500)
-    plt.title(f"Avg. Steps -- last 500")
+    fig_setup('Step')
+    plt.title(f"Avg. Steps $-$ last 500")
     savefig(f"multi-plot-{'-'.join(file_names)}-learning_curve-clean.png")
 
     plt.figure()
     plt.subplot(2, 1, 1)
     plot_curve_avg(names, r_saves, last=1000)
-    plt.title(f"Avg. Rewards -- last 1000")
+    fig_setup('Checkmate')
+    plt.title(f"Avg. Checkmates $-$ last 1000")
 
     plt.subplot(2, 1, 2)
     plot_curve_avg(names, step_saves, last=1000)
-    plt.title(f"Avg. Steps -- last 1000")
+    fig_setup('Step')
+    plt.title(f"Avg. Steps $-$ last 1000")
     savefig(f"multi-plot-{'-'.join(file_names)}-learning_curve-super-clean.png")
 
     plt.figure()
     x = {}
     for idx in range(len(names)):
         moving_avg = generate_moving_avg(r_saves[idx], last=500)
-        x[f'Avg. Reward {names[idx]}'] = moving_avg[-100:]
+        x[names[idx]] = moving_avg[-100:]
     df = pandas.DataFrame(x)
     df.boxplot()
-    plt.title(f"Avg. Rewards for last 100")
+    plt.xticks(rotation=45, ha='right')
+    plt.title(f"Avg. Checkmates for last 100")
+    fig_setup('Avg. Checkmate', xlabel='')
     savefig(f"multi-plot-{'-'.join(file_names)}-avg-reward-box-plot.png")
 
     plt.figure()
     x = {}
     for idx in range(len(names)):
-        x[f'Steps {names[idx]}'] = step_saves[idx][-100:]
+        x[names[idx]] = step_saves[idx][-100:]
     df = pandas.DataFrame(x)
     df.boxplot()
+    plt.xticks(rotation=45, ha='right')
     plt.title(f"Steps for last 100")
+    fig_setup('Step', xlabel='')
     savefig(f"multi-plot-{'-'.join(file_names)}-steps-box-plot.png")
 
 
@@ -81,12 +91,9 @@ def generate_singe_plot(name, reward, move):
     plt.close('all')
 
 
-def savefig(filename, xlabel="Epoch", ylabel="Reward"):
-    # TODO: FIX AXIS NAME!!!
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+def savefig(filename):
     plt.tight_layout()
-    plt.rcParams['figure.figsize'] = [17, 10]
+    plt.rcParams['figure.figsize'] = [6, 5]
     plt.savefig(config.model_data_file(filename), transparent="True", pad_inches=0)
 
 
@@ -117,17 +124,22 @@ def evaluate_agent(name, reward):
     x = np.linspace(0, len(reward))
     plt.plot(x, [avg] * len(x), label="Average")
     plt.plot(x, [AIM] * len(x), label="Aim")
-    plt.grid(True)
-    plt.legend()
+    fig_setup('Checkmate')
     savefig(f"{name}-learning_curve.png")
 
     plt.figure()
     plt.plot([i + 1 for i in range(1000, len(reward))], moving_avg_1000, label="Average last 1000")
     plt.plot(x, [avg] * len(x), label="Average")
     plt.plot(x, [AIM] * len(x), label="Aim")
+    fig_setup('Checkmate')
+    savefig(f"{name}-learning_curve_clean.png")
+
+
+def fig_setup(ylabel, xlabel='Epoch'):
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
     plt.grid(True)
     plt.legend()
-    savefig(f"{name}-learning_curve_clean.png")
 
 
 def genrate_box_plots(name, reward):

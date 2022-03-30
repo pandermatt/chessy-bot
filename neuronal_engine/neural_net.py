@@ -8,7 +8,8 @@ from util.logger import log
 
 SARSA = 'sarsa'
 QLEARNING = 'q-learning'
-MAX_STEPS_ALLOWED = 1000
+MAX_STEPS_ALLOWED = 100
+FINISH_GAME_AFTER_STEPS = 20
 
 
 class NeuralNet:
@@ -33,7 +34,6 @@ class NeuralNet:
         self.prop = PropagationHandler(self)
 
         self.weights, self.biases = initialize_weights(self.layer_sizes, self.xavier)
-
 
     def train(self, N_episodes, callback):
         checkmate_save = np.zeros(N_episodes)
@@ -63,7 +63,8 @@ class NeuralNet:
                 else:
                     a_agent, qvalue = epsilon_greedy_policy(x[-1], a, epsilon_f)
 
-                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent)
+                S_next, X_next, allowed_a_next, R, Done = self.env.one_step(a_agent,
+                                                                            move_counter > FINISH_GAME_AFTER_STEPS)
 
                 if Done == 1:
                     self.prop.backprop(x, h, a_agent, R, qvalue, Done)
@@ -162,5 +163,3 @@ class SarsaNnLeakyReLU(SarsaNn):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.activation = 'leakyrelu'
-
-

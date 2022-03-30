@@ -5,7 +5,7 @@ import numpy as np
 from flask import Flask, render_template
 from turbo_flask import Turbo
 
-from agents.q_table_agent import QTableAgent
+from agents.chessy_agent import SarsaChessyAgent
 
 app = Flask(__name__, static_folder='static', static_url_path='')
 turbo = Turbo(app)
@@ -42,7 +42,7 @@ def update_load():
                                }
                 turbo.push(turbo.replace(render_template('chess_board.html'), 'load'))
 
-        QTableAgent(300000).run(update_web)
+        SarsaChessyAgent(100000).run(update_web)
 
 
 def calculate_location(S):

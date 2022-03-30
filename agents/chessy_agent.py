@@ -36,6 +36,16 @@ class SarsaChessyAgent(ChessyAgent):
     NN_KLASS = SarsaNn
 
 
+class SarsaChessyAgentOneHiddens(SarsaChessyAgent):
+    def _get_layer_sizes(self):
+        board_state, X, allowed_actions = self.env.initialise_game()
+        N_a = np.shape(allowed_actions)[0]
+        N_in = np.shape(X)[0]
+        N_h1 = 200
+
+        return [N_in, N_h1, N_a]
+
+
 class SarsaChessyAgentCustomReward(SarsaChessyAgent):
     NAME = 'SARSA with negative reward (-0.1)'
 
@@ -115,5 +125,5 @@ class QLearningChessyAgentHighReward(QLearningChessyAgent):
 
 
 class SarsaChessyAgentLeakyReLU(ChessyAgent):
-    NAME = "SARSA LeakyReLU"
+    NAME = "SARSA Leaky ReLU"
     NN_KLASS = SarsaNnLeakyReLU
