@@ -207,7 +207,7 @@ class SarsaNnCustomValues(SarsaNn):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def set_custom_values(self, beta=0.00005, gamma=0.0, eta=0.005):
+    def set_custom_values(self, beta=0.00005, gamma=0.9, eta=0.005):
         self.beta = beta
         self.gamma = gamma
         self.eta = eta
