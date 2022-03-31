@@ -6,6 +6,11 @@ from agents.chessy_agent import QLearningChessyAgent, QLearningChessyAgentLeakyR
     SarsaChessyAgentHighReward, QLearningChessyAgentCustomReward, QLearningChessyAgentCustomReward2, \
     SarsaChessyAgentCustomReward, SarsaChessyAgentCustomReward2, DoubleQLearningChessyAgent, DoubleSarsaChessyAgent, \
     SarsaChessyAgentSigmoid, SarsaChessyAgentLeakyReLU
+from agents.custom_values_agent import SarsaChessyAgentCustomValuesGamma1, SarsaChessyAgentCustomValuesGamma2, \
+    SarsaChessyAgentCustomValuesGamma3, SarsaChessyAgentCustomValuesGamma4, SarsaChessyAgentCustomValuesGamma5, \
+    SarsaChessyAgentCustomValuesBeta1, SarsaChessyAgentCustomValuesBeta2, SarsaChessyAgentCustomValuesBeta3, \
+    SarsaChessyAgentCustomValuesBeta4, SarsaChessyAgentCustomValuesBeta5, SarsaChessyAgentCustomValuesEta1, \
+    SarsaChessyAgentCustomValuesEta3, SarsaChessyAgentCustomValuesEta2, SarsaChessyAgentCustomValuesEta4
 from agents.q_table_agent import QTableAgent, QTableAgentCustomReward2, QTableAgentCustomReward
 from util.logger import log
 from util.plotting import generate_multi_plot, \
@@ -103,7 +108,25 @@ if __name__ == '__main__':
     # compare hidden layer_sizes
     run_and_compare([SarsaChessyAgentOneHidden, SarsaChessyAgent, SarsaChessyAgentThreeHidden])
 
+    # compare different parameters
     run_and_compare([QLearningChessyAgent,
                      QLearningChessyAgentLeakyReLU,
                      QLearningChessyAgentRMSProp,
                      QLearningChessyAgentRMSPropLeakyReLU])
+
+    run_and_compare([SarsaChessyAgentCustomValuesGamma1,
+                     SarsaChessyAgentCustomValuesGamma2,
+                     SarsaChessyAgentCustomValuesGamma3,
+                     SarsaChessyAgentCustomValuesGamma4,
+                     SarsaChessyAgentCustomValuesGamma5])
+
+    run_and_compare([SarsaChessyAgentCustomValuesBeta1,
+                     SarsaChessyAgentCustomValuesBeta2,
+                     SarsaChessyAgentCustomValuesBeta3,
+                     SarsaChessyAgentCustomValuesBeta4,
+                     SarsaChessyAgentCustomValuesBeta5])
+
+    run_and_compare([SarsaChessyAgentCustomValuesEta1,
+                     SarsaChessyAgentCustomValuesEta2,
+                     SarsaChessyAgentCustomValuesEta3,
+                     SarsaChessyAgentCustomValuesEta4])
