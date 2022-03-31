@@ -1,9 +1,10 @@
 # ♟🤖 Chessy Bot
 
+## Run
 
-Use `python main.py` to run all the agents.
-
-Use `flask run` to view the webpage and then open <http://127.0.0.1:5000/>
+- Install requirements `pip install -r requirements.txt`
+- Use `python main.py` to run all the agents.
+- Use `flask run` to view the webpage and then open <http://127.0.0.1:5000/>
 
 
 ## Demo

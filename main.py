@@ -30,7 +30,7 @@ def print_to_console(agent, _, n, N_episodes, R_save, N_moves_save):
 
 def run_and_compare(agent_class_list):
     np.random.seed(42)
-    N_episodes = 50000
+    N_episodes = 500000
 
     file_names = []
     names = []
