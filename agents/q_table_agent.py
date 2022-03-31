@@ -9,6 +9,9 @@ from util.logger import log
 
 
 class QTableAgent(Agent):
+    """
+    QTableAgent with an Q table
+    """
     NAME = 'Q-learning with Q-table'
 
     def __init__(self, N_episodes):
@@ -37,6 +40,10 @@ class QTableAgent(Agent):
         return a, qvalue
 
     def run(self, callback=lambda *args: None):
+        """
+        @param callback: Method to call after each episode.
+        @return: Array containing name, rewards and steps of every episode.
+        """
         super().run()
         epsilon_0 = 0.2  # STARTING VALUE OF EPSILON FOR THE EPSILON-GREEDY POLICY
         beta = 0.00005  # THE PARAMETER SETS HOW QUICKLY THE VALUE OF EPSILON IS DECAYING (SEE epsilon_f BELOW)
@@ -91,6 +98,9 @@ class QTableAgent(Agent):
 
         return self.NAME, R_save, N_moves_save
 
+
+# PLEASE: CHECK NAME OF AGENT FOR THE DESCRIPTION
+# THE CLEAN CLASS ALWAYS RUNS WITH THE DEFAULT Q_TABLE_AGENT AND ITS CONFIG
 
 class QTableAgentCustomReward(QTableAgent):
     NAME = 'Q-learning with Q-table with negative reward'

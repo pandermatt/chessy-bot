@@ -1,7 +1,9 @@
 import numpy as np
 
 class Adam:
-
+    """
+    Handles the computation of the Adam optimizer.
+    """
     def __init__(self, Params, beta1):
         # It finds out if the parameters given are in a vector (N_dim=1) or a matrix (N_dim=2)
         N_dim = np.shape(np.shape(Params))[0]
@@ -45,6 +47,9 @@ class Adam:
 
 
 class RMSProp:
+    """
+    Handles the computation of the RMSProp optimizer.
+    """
 
     def __init__(self, Params, gamma):
         # It finds out if the parameters given are in a vector (N_dim=1) or a matrix (N_dim=2)

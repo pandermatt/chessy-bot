@@ -8,6 +8,12 @@ AIM = 0.99
 
 
 def epsilon_greedy_policy(Qvalues, a, epsilon):
+    """
+    @param Qvalues
+    @param a: action
+    @param epsilon
+    @return: next action and next qvalue
+    """
     if np.random.uniform(0, 1) < epsilon:
         a = random.choice(a)
     else:
@@ -19,12 +25,27 @@ def epsilon_greedy_policy(Qvalues, a, epsilon):
 
 
 def finished(reward, n, max, last=500):
+    """
+    Checks if the agent should terminate.
+    It considers the last x values defined in parameter: last
+
+    @param reward: all past rewards
+    @param n: current episode number
+    @param max: max reward possible
+    @param last: last rewards to consider
+    @return: Boolean value if finished or not
+    """
     if len(reward) <= last:
         return False
     return np.mean(np.divide(reward[(n - last):n], max)) >= AIM
 
 
 def initialize_weights(layer_sizes, xavier):
+    """
+    @param layer_sizes:
+    @param xavier: Should use xavier to init
+    @return: weights and biases
+    """
     weights = []
     biases = []
     for idx in range(len(layer_sizes) - 1):
@@ -42,6 +63,12 @@ def initialize_weights(layer_sizes, xavier):
 
 
 def initialize_adam(weights, biases, beta_adam):
+    """
+    @param weights
+    @param biases
+    @param beta_adam
+    @return: adam weights, biases
+    """
     adam_w = []
     adam_b = []
     for idx in range(len(weights)):
@@ -52,6 +79,12 @@ def initialize_adam(weights, biases, beta_adam):
 
 
 def initialize_rmsprop(weights, biases, gamma_rmsprop):
+    """
+    @param weights
+    @param biases
+    @param gamma_rmsprop
+    @return: rms weights, biases
+    """
     rms_w = []
     rms_b = []
     for idx in range(len(weights)):

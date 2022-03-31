@@ -108,7 +108,6 @@ if __name__ == '__main__':
     # compare hidden layer_sizes
     run_and_compare([SarsaChessyAgentOneHidden, SarsaChessyAgent, SarsaChessyAgentThreeHidden])
 
-    
     run_and_compare([QLearningChessyAgent,
                      QLearningChessyAgentLeakyReLU,
                      QLearningChessyAgentRMSProp,

@@ -4,6 +4,9 @@ from agents.agent import Agent
 
 
 class FirstFiveAgent(Agent):
+    """
+    Simple agent that prints the first five episodes.
+    """
     NAME = 'First 5 Steps'
 
     def run(self, callback=lambda *args: None):

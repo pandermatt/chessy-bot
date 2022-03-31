@@ -2,6 +2,11 @@ from agents.chessy_agent import ChessyAgent
 from neuronal_engine.neural_net import SarsaNnCustomValues
 
 
+# THIS FILE CONTAINS INFORMATION ABOUT THE CUSTOM EXPERIMENTS
+# WITH DIFFERENT BETA, GAMMA AND ETA VALUES.
+# PLEASE: CHECK NAME OF AGENT FOR THE DESCRIPTION
+# THE CLEAN CLASS ALWAYS RUNS WITH THE DEFAULT CHESSY_AGENT AND ITS CONFIG
+
 class SarsaChessyAgentCustomValuesGamma1(ChessyAgent):
     NAME = "SARSA $\gamma = 0.95$"
     NN_KLASS = SarsaNnCustomValues

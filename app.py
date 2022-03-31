@@ -31,6 +31,15 @@ def before_first_request():
 def update_load():
     with app.app_context():
         def update_web(_, S, n, N_episodes, R_save, N_moves_save):
+            """
+            Method to update the web
+            @param _: ignored
+            @param S: board
+            @param n: current episode
+            @param N_episodes: total episodes
+            @param R_save: array containing rewards
+            @param N_moves_save: array containing moves
+            """
             if n % 10 == 0:
                 global app_content
                 app_content = {'board': calculate_location(S),
@@ -46,6 +55,10 @@ def update_load():
 
 
 def calculate_location(S):
+    """
+    @param S: board
+    @return: converted ascii position of the chess figure.
+    """
     board = np.array(S)
     board_location = {
         convert_location_to_letters(board, 1): 'wK',  # 1 = location of the King bK

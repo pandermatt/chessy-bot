@@ -4,6 +4,9 @@ import numpy as np
 
 
 class PropagationHandler:
+    """
+    Calculates the propagation of the neural network
+    """
     def __init__(self, nn):
         self.nn = nn
 
@@ -64,6 +67,10 @@ class PropagationHandler:
                 biases[idx] += self.nn.rms_eta * self.nn.rms_b[idx].Compute(dbiases[idx])
 
     def backprop_relu(self, x, h, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken):
+        """
+        Backprop for ReLU
+        @return: weights, biases
+        """
         for idx in range(len(weights)):
             if idx == 0:
                 if Done == 1:
@@ -80,6 +87,10 @@ class PropagationHandler:
         return dweights, dbiases
 
     def backprop_sigmoid(self, x, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken):
+        """
+        Backprop for Sigmoid
+        @return: weights, biases
+        """
         for idx in range(len(weights)):
             if idx == 0:
                 if Done == 1:
@@ -96,6 +107,10 @@ class PropagationHandler:
         return dweights, dbiases
 
     def backprop_leakyrelu(self, x, h, R, qvalue, Done, qvalue_next, weights, dweights, dbiases, action_taken):
+        """
+        Backprop for Leaky ReLU
+        @return: weights, biases
+        """
         dh = []
         for _h in h:
             dh_next = np.ones_like(_h)
@@ -126,6 +141,9 @@ class PropagationHandler:
 
 
 class DoublePropagationHandler(PropagationHandler):
+    """
+    Extends PropagationHandler to be able to forward pass and backprop multiple neural networks
+    """
     def forward_pass(self, X):
         if self.nn.counter == 0:
             self.nn.counter += 1

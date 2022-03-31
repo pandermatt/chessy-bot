@@ -13,6 +13,11 @@ FINISH_GAME_AFTER_STEPS = 20
 
 
 class NeuralNet:
+    """
+    Neural Net engine for most of the chessy agents.
+    It contains SARSA and QLEARNING.
+    """
+
     def __init__(self, agent, xavier=False):
         self.agent = agent
         self.env = agent.env
@@ -36,6 +41,11 @@ class NeuralNet:
         self.weights, self.biases = initialize_weights(self.layer_sizes, self.xavier)
 
     def train(self, N_episodes, callback):
+        """
+        @param N_episodes: Nr of episodes
+        @param callback: Method to call after each episode.
+        @return: Array containing name, rewards and steps of every episode.
+        """
         checkmate_save = np.zeros(N_episodes)
         N_moves_save = []
         R_save = []
@@ -94,6 +104,9 @@ class NeuralNet:
         log.info(f"Checkmates: {np.count_nonzero(checkmate_save > 0)}")
         return self.agent.NAME, R_save, N_moves_save
 
+
+# PLEASE: CHECK CLASS NAME OF THE CUSTOM NEURAL NETWORK FOR THE DESCRIPTION
+# THE CLEAN CLASS ALWAYS RUNS WITH THE DEFAULT CONFIG
 
 class SarsaNn(NeuralNet):
     type = SARSA

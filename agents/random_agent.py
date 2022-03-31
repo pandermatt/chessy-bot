@@ -4,13 +4,13 @@ from agents.agent import Agent
 
 
 class RandomAgent(Agent):
+    """
+    Perform N Episodes Making Random Actions
+    And Compute The Average Reward And Number Of Moves
+    """
     NAME = 'Random Agent'
 
     def run(self, callback=lambda *args: None):
-        """
-        Perform N Episodes Making Random Actions
-        And Compute The Average Reward And Number Of Moves
-        """
         N_episodes = 1000
 
         R_save_random = np.zeros([N_episodes, 1])

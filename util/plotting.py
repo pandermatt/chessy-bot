@@ -7,6 +7,8 @@ from neuronal_engine.helper import AIM
 from util.logger import log
 
 
+# HELPER METHODS FOR THE PLOTTING OF THE AGENTS
+
 def print_stats(name, r_save, step_save):
     log.info('------------------------')
     log.info(name)

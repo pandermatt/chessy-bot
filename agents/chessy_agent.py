@@ -8,22 +8,32 @@ from neuronal_engine.neural_net import SarsaNn, QlearningNn, DoubleQlearningNn, 
 
 
 class ChessyAgent(Agent):
+    """
+    Main Class for all ChessyAgents.
+    Each Class has a name, and an own custom neural network.
+    """
     NN_KLASS = NeuralNet
 
     def __init__(self, N_episodes):
+        """
+        @param N_episodes: Nr of episodes
+        """
         super().__init__()
         self.N_episodes = N_episodes
 
     def _get_layer_sizes(self):
+        """
+        @return: layer sizes with hidden nodes
+        """
         board_state, X, allowed_actions = self.env.initialise_game()
-        N_a = np.shape(allowed_actions)[0]  # TOTAL NUMBER OF POSSIBLE ACTIONS
-        N_in = np.shape(X)[0]  # INPUT SIZE
-        N_h1 = 200  # NUMBER OF HIDDEN NODES
+        # AMOUNT POSSIBLE ACTIONS
+        N_a = np.shape(allowed_actions)[0]
+        # INPUT SIZE
+        N_in = np.shape(X)[0]
+
+        # NUMBER OF HIDDEN NODES
+        N_h1 = 200
         N_h2 = 200
-        # INITIALISE THE PARAMETERS OF YOUR NEURAL NETWORK AND...
-        # PLEASE CONSIDER USING A MASK OF ONE FOR THE ACTION MADE
-        # AND ZERO OTHERWISE IF YOU ARE NOT USING VANILLA GRADIENT DESCENT...
-        # WE SUGGEST A NETWORK WITH ONE HIDDEN LAYER WITH SIZE 200.
 
         return [N_in, N_h1, N_h2, N_a]
 
@@ -31,6 +41,9 @@ class ChessyAgent(Agent):
         nn = self.NN_KLASS(self, xavier=True)
         return nn.train(self.N_episodes, callback)
 
+
+# PLEASE: CHECK NAME OF AGENT FOR THE DESCRIPTION
+# THE CLEAN CLASS ALWAYS RUNS WITH THE DEFAULT CHESSY_AGENT AND ITS CONFIG
 
 class SarsaChessyAgent(ChessyAgent):
     NAME = "SARSA"
