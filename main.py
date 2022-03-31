@@ -14,7 +14,7 @@ from agents.custom_values_agent import SarsaChessyAgentCustomValuesGamma1, Sarsa
 from agents.q_table_agent import QTableAgent, QTableAgentCustomReward2, QTableAgentCustomReward
 from util.logger import log
 from util.plotting import generate_multi_plot, \
-    generate_singe_plot, print_stats
+    print_stats, generate_singe_plot
 from util.storage_io import dump_file, load_file, is_model_present
 
 intern_output_nr = 500
@@ -30,7 +30,7 @@ def print_to_console(agent, _, n, N_episodes, R_save, N_moves_save):
 
 def run_and_compare(agent_class_list):
     np.random.seed(42)
-    N_episodes = 100000
+    N_episodes = 50000
 
     file_names = []
     names = []
@@ -108,12 +108,14 @@ if __name__ == '__main__':
     # compare hidden layer_sizes
     run_and_compare([SarsaChessyAgentOneHidden, SarsaChessyAgent, SarsaChessyAgentThreeHidden])
 
-    # compare different parameters
+    
     run_and_compare([QLearningChessyAgent,
                      QLearningChessyAgentLeakyReLU,
                      QLearningChessyAgentRMSProp,
                      QLearningChessyAgentRMSPropLeakyReLU])
 
+    # compare different parameters
+    # Check class description for details.
     run_and_compare([SarsaChessyAgentCustomValuesGamma1,
                      SarsaChessyAgentCustomValuesGamma2,
                      SarsaChessyAgentCustomValuesGamma3,
