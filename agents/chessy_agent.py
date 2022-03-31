@@ -168,3 +168,76 @@ class QLearningChessyAgentHighReward(QLearningChessyAgent):
 class SarsaChessyAgentLeakyReLU(ChessyAgent):
     NAME = "SARSA Leaky ReLU"
     NN_KLASS = SarsaNnLeakyReLU
+
+
+class SarsaChessyAgentStepReward1(SarsaChessyAgent):
+    NAME = 'SARSA'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_step=0, reward_checkmate=1, reward_draw=0)
+
+
+class SarsaChessyAgentStepReward2(SarsaChessyAgent):
+    NAME = 'SARSA step -0.01'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_step=-0.01, reward_checkmate=1, reward_draw=0)
+
+
+class SarsaChessyAgentStepReward3(SarsaChessyAgent):
+    NAME = 'SARSA step -0.1'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_step=-0.1, reward_checkmate=1, reward_draw=0)
+
+
+class SarsaChessyAgentMateReward1(SarsaChessyAgent):
+    NAME = 'SARSA'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_checkmate=1, reward_step=0, reward_draw=0)
+
+
+class SarsaChessyAgentMateReward2(SarsaChessyAgent):
+    NAME = 'SARSA checkmate 5'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_checkmate=5, reward_step=0, reward_draw=0)
+
+
+class SarsaChessyAgentMateReward3(SarsaChessyAgent):
+    NAME = 'SARSA checkmate 10'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_checkmate=10, reward_step=0, reward_draw=0)
+
+
+class SarsaChessyAgentDrawReward1(SarsaChessyAgent):
+    NAME = 'SARSA draw -1'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_draw=-1, reward_step=0, reward_checkmate=1)
+
+
+class SarsaChessyAgentDrawReward2(SarsaChessyAgent):
+    NAME = 'SARSA draw -5'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_draw=-5, reward_step=0, reward_checkmate=1)
+
+
+class SarsaChessyAgentDrawReward3(SarsaChessyAgent):
+    NAME = 'SARSA'
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_draw=0, reward_step=0, reward_checkmate=1)
+

@@ -5,12 +5,15 @@ from agents.chessy_agent import QLearningChessyAgent, QLearningChessyAgentLeakyR
     SarsaChessyAgentThreeHidden, SarsaChessyAgentAdam, SarsaChessyAgentRMSProp, QLearningChessyAgentHighReward, \
     SarsaChessyAgentHighReward, QLearningChessyAgentCustomReward, QLearningChessyAgentCustomReward2, \
     SarsaChessyAgentCustomReward, SarsaChessyAgentCustomReward2, DoubleQLearningChessyAgent, DoubleSarsaChessyAgent, \
-    SarsaChessyAgentSigmoid, SarsaChessyAgentLeakyReLU
+    SarsaChessyAgentSigmoid, SarsaChessyAgentLeakyReLU, SarsaChessyAgentStepReward1, SarsaChessyAgentStepReward2, \
+    SarsaChessyAgentStepReward3, SarsaChessyAgentMateReward1, SarsaChessyAgentMateReward2, SarsaChessyAgentMateReward3, \
+    SarsaChessyAgentDrawReward1, SarsaChessyAgentDrawReward2, SarsaChessyAgentDrawReward3
 from agents.custom_values_agent import SarsaChessyAgentCustomValuesGamma1, SarsaChessyAgentCustomValuesGamma2, \
     SarsaChessyAgentCustomValuesGamma3, SarsaChessyAgentCustomValuesGamma4, SarsaChessyAgentCustomValuesGamma5, \
     SarsaChessyAgentCustomValuesBeta1, SarsaChessyAgentCustomValuesBeta2, SarsaChessyAgentCustomValuesBeta3, \
     SarsaChessyAgentCustomValuesBeta4, SarsaChessyAgentCustomValuesBeta5, SarsaChessyAgentCustomValuesEta1, \
-    SarsaChessyAgentCustomValuesEta3, SarsaChessyAgentCustomValuesEta2, SarsaChessyAgentCustomValuesEta4
+    SarsaChessyAgentCustomValuesEta3, SarsaChessyAgentCustomValuesEta2, SarsaChessyAgentCustomValuesEta4, \
+    SarsaChessyAgentEnhancedRewards
 from agents.q_table_agent import QTableAgent, QTableAgentCustomReward2, QTableAgentCustomReward
 from util.logger import log
 from util.plotting import generate_multi_plot, \
@@ -131,3 +134,21 @@ if __name__ == '__main__':
                      SarsaChessyAgentCustomValuesEta2,
                      SarsaChessyAgentCustomValuesEta3,
                      SarsaChessyAgentCustomValuesEta4])
+
+    # compare different parameters
+    # Check class description for details.
+    run_and_compare([SarsaChessyAgentStepReward1,
+                     SarsaChessyAgentStepReward2,
+                     SarsaChessyAgentStepReward3])
+
+    run_and_compare([SarsaChessyAgentMateReward1,
+                     SarsaChessyAgentMateReward2,
+                     SarsaChessyAgentMateReward3])
+
+    run_and_compare([SarsaChessyAgentDrawReward1,
+                     SarsaChessyAgentDrawReward2,
+                     SarsaChessyAgentDrawReward3])
+
+    # compare optimized SARSA vs vanilla SARSA
+    run_and_compare([SarsaChessyAgentEnhancedRewards,
+                     SarsaChessyAgent])

@@ -1,4 +1,5 @@
 from agents.chessy_agent import ChessyAgent
+from chess_env import ChessEnv
 from neuronal_engine.neural_net import SarsaNnCustomValues
 
 
@@ -17,7 +18,7 @@ class SarsaChessyAgentCustomValuesGamma1(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesGamma2(ChessyAgent):
+class SarsaChessyAgentCustomValuesGamma3(ChessyAgent):
     NAME = "SARSA $\gamma = 0.8$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -27,7 +28,7 @@ class SarsaChessyAgentCustomValuesGamma2(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesGamma3(ChessyAgent):
+class SarsaChessyAgentCustomValuesGamma4(ChessyAgent):
     NAME = "SARSA $\gamma = 0.6$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -37,7 +38,7 @@ class SarsaChessyAgentCustomValuesGamma3(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesGamma4(ChessyAgent):
+class SarsaChessyAgentCustomValuesGamma5(ChessyAgent):
     NAME = "SARSA $\gamma = 0.5$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -47,7 +48,7 @@ class SarsaChessyAgentCustomValuesGamma4(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesGamma5(ChessyAgent):
+class SarsaChessyAgentCustomValuesGamma2(ChessyAgent):
     NAME = "SARSA $\gamma = 0.9$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -57,7 +58,7 @@ class SarsaChessyAgentCustomValuesGamma5(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesBeta1(ChessyAgent):
+class SarsaChessyAgentCustomValuesBeta3(ChessyAgent):
     NAME = "SARSA $\\beta = 0.0005$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -67,7 +68,7 @@ class SarsaChessyAgentCustomValuesBeta1(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesBeta2(ChessyAgent):
+class SarsaChessyAgentCustomValuesBeta4(ChessyAgent):
     NAME = "SARSA $\\beta = 0.005$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -77,7 +78,7 @@ class SarsaChessyAgentCustomValuesBeta2(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesBeta3(ChessyAgent):
+class SarsaChessyAgentCustomValuesBeta5(ChessyAgent):
     NAME = "SARSA $\\beta = 0.05$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -87,7 +88,7 @@ class SarsaChessyAgentCustomValuesBeta3(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesBeta4(ChessyAgent):
+class SarsaChessyAgentCustomValuesBeta1(ChessyAgent):
     NAME = "SARSA $\\beta = 0.000005$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -97,7 +98,7 @@ class SarsaChessyAgentCustomValuesBeta4(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesBeta5(ChessyAgent):
+class SarsaChessyAgentCustomValuesBeta2(ChessyAgent):
     NAME = "SARSA $\\beta = 0.00005$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -107,7 +108,7 @@ class SarsaChessyAgentCustomValuesBeta5(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesEta1(ChessyAgent):
+class SarsaChessyAgentCustomValuesEta3(ChessyAgent):
     NAME = "SARSA $\eta = 0.05$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -117,7 +118,7 @@ class SarsaChessyAgentCustomValuesEta1(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesEta2(ChessyAgent):
+class SarsaChessyAgentCustomValuesEta4(ChessyAgent):
     NAME = "SARSA $\\eta = 0.5$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -127,7 +128,7 @@ class SarsaChessyAgentCustomValuesEta2(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesEta3(ChessyAgent):
+class SarsaChessyAgentCustomValuesEta1(ChessyAgent):
     NAME = "SARSA $\eta = 0.0005$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -137,7 +138,7 @@ class SarsaChessyAgentCustomValuesEta3(ChessyAgent):
         return nn.train(self.N_episodes, callback)
 
 
-class SarsaChessyAgentCustomValuesEta4(ChessyAgent):
+class SarsaChessyAgentCustomValuesEta2(ChessyAgent):
     NAME = "SARSA $\eta = 0.005$"
     NN_KLASS = SarsaNnCustomValues
 
@@ -185,3 +186,15 @@ class SarsaChessyAgentCustomValues9(ChessyAgent):
         nn = self.NN_KLASS(self, xavier=True)
         nn.set_custom_values(beta=0.001, gamma=0.85)
         return nn.train(self.N_episodes, callback)
+
+class SarsaChessyAgentEnhancedRewards(ChessyAgent):
+    NAME = 'SARSA enhanced'
+    NN_KLASS = SarsaNnCustomValues
+
+    def __init__(self, N_episodes):
+        super().__init__(N_episodes)
+        self.env = ChessEnv(4, reward_draw=-1, reward_step=-0.01, reward_checkmate=10)
+
+    def run(self, callback=lambda *args: None):
+        nn = self.NN_KLASS(self, xavier=True)
+        nn.set_custom_values(eta=0.05, beta=0.005, gamma=0.95)
